@@ -1,4 +1,0 @@
-  File "/home/dje4001/post_dlc/dlc_process.py", line 12
-    deeplabcut.create_video_with_all_detections(path_to_config, [path_to_MP4], videotype='.mp4')
-                                                                                               ^
-TabError: inconsistent use of tabs and spaces in indentation
