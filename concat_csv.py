@@ -11,11 +11,11 @@ import argparse
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--video_root_dir',type=str,required=True)
-parser.add_argument('--filename',type=str,required=True)
+parser.add_argument('--final_filename',type=str,required=True)
 
 if __name__=="__main__":    
     args=parser.parse_args()
-    os.chdir(args.root_dir)
+    os.chdir(args.video_root_dir)
     all_files=[i for i in glob.glob('*.csv')]
     combined_csv=pd.concat([pd.read_csv(f) for f in all_files])
-    combined_csv.to_csv(args.filename,index=False)
+    combined_csv.to_csv(args.final_filename,index=False)

@@ -47,6 +47,8 @@ def group_videos(video_dir):
         concatenate_dataframes(related_files)
     return
 
+group_videos("/athena/listonlab/store/dje4001/deeplabcut/processed_video_drop/")
+
 """ video directory to start concating data """
 parser=argparse.ArgumentParser()
 parser.add_argument('--videos_dir',type=str,required=True) #input to config file

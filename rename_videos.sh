@@ -10,6 +10,7 @@ do
 	dn=$(dirname $video)
 	folder_name=${dn##*/}
 	output_name="${dn}/$folder_name${fn}"
+	echo $video	
 	echo $output_name
 	mv "$video" "$output_name"
 done
