@@ -3,6 +3,7 @@ import numpy as np
 import tqdm
 from scipy.interpolate import interp1d
 import pickle
+import os
 import ipdb
 
 class ingestion():
@@ -159,15 +160,30 @@ class graphics():
             self.attached_video=True
 
     def __call__(self):
+        # Need to code these in later
         self.plot_trajectory()
         self.plot_distance()
         self.plot_speed()
         self.plot_acceleration()
 
+def file_finder(directory):
+    """ find all files of interest (csv, video, etc) in 
+    current directory and put them in organized list """
+    return
+
 def main(inputfile,outputfile):
-    obj_oh = digestion(inputfile)
-    obj_oh()
-    obj_oh.save(outputfile)
+    """ Main set of steps for current analysis. """
+    #Insert file finder function???
+
+    # Determine if csv file has been analyzed before, load in data if true
+    if os.path.isfile(outputfile):
+        obj_oh = digestion.load(outputfile)
+    else:
+        obj_oh = digestion(inputfile)
+        obj_oh()
+        obj_oh.save(outputfile)
+    
+    # Generate graphics for current obj ... add in a loading feature later. 
     graph_obj = graphics(digestiondata=obj_oh)
 
 if __name__=='__main__':
