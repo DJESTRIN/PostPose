@@ -67,8 +67,7 @@ class ingestion():
             bd_int = bodypart.copy()
             bd_int[np.isnan(bodypart)] = infunc(np.arange(len(bodypart))[np.isnan(bodypart)])
             y_interpolated.append(bd_int)
-        self.y=np.asarray(y_interpolated).T
-        
+        self.y=np.asarray(y_interpolated).T       
 
 class digestion(ingestion):
     """ Performs essential analyses that are common for all behaviors """
@@ -129,9 +128,10 @@ class digestion(ingestion):
     def distance(self,x1,x2,y1,y2):
         """ Returns distance for coordinates """
         return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
+    
     def speed(self,d1,d2):
         """ Returns speed for distances """
+        #???
         return (d2-d1)*self.framerate ### Is this right? change in distance / change in time
 
     def acceleration_mag(self,s1,s2):
@@ -149,22 +149,6 @@ class digestion(ingestion):
         with open(filename, "wb") as file:
             pickle.dump(self, file)
 
-    
-class graphics():
-    def __init__(self,digested_obj,output_directory,video_file=[]):
-        # Did user include a video for us to use for plotting?
-        if video_file:
-            self.video_file=video_file
-            self.attached_video=True
-        else:
-            self.attached_video=True
-
-    def __call__(self):
-        # Need to code these in later
-        self.plot_trajectory()
-        self.plot_distance()
-        self.plot_speed()
-        self.plot_acceleration()
 
 def file_finder(directory):
     """ find all files of interest (csv, video, etc) in 
