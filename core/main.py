@@ -14,15 +14,24 @@ from gestion import digestion
 from graphics import graphics
 
 class main:
-    def __init__(self):
+    def __init__(self,root_dir):
+        self.root_dir=root_dir
 
-    def find_files(self):
+        # Get all files of interest
+        self.video_files=self.find_files(extension='.mp4')
+        self.csv_files=self.find_files(extension='.csv')
+        self.custom_objects=self.find_files(extension='.pkl')
+
+    def find_files(self,extension=".csv"):
         """ find all files of interest (csv, video, etc) in 
         current directory and put them in organized list """
+        return glob.glob(f"{self.root_dir}/**/*{extension}", recursive=True)
 
     def __call__(self):
         """ Main set of steps for current analysis. """
-        #Insert file finder function???
+        # Run digestion, or tst, or openfeild
+        # Run graphics
+        # Collect info?
 
         # Determine if csv file has been analyzed before, load in data if true
         if os.path.isfile(outputfile):
