@@ -149,27 +149,6 @@ class digestion(ingestion):
         with open(filename, "wb") as file:
             pickle.dump(self, file)
 
-
-def file_finder(directory):
-    """ find all files of interest (csv, video, etc) in 
-    current directory and put them in organized list """
-    return
-
-def main(inputfile,outputfile):
-    """ Main set of steps for current analysis. """
-    #Insert file finder function???
-
-    # Determine if csv file has been analyzed before, load in data if true
-    if os.path.isfile(outputfile):
-        obj_oh = digestion.load(outputfile)
-    else:
-        obj_oh = digestion(inputfile)
-        obj_oh()
-        obj_oh.save(outputfile)
-    
-    # Generate graphics for current obj ... add in a loading feature later. 
-    graph_obj = graphics(digestiondata=obj_oh)
-
 if __name__=='__main__':
     fileoh = ''
     main(inputfile=fileoh,outputfile=r'\insert\some\directory\myobj.pkl')
