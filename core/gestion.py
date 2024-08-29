@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Module name: gestion.py
+Description: 
+Author: David Estrin, Kenneth Johnson
+Version: 1.0
+Date: 08-29-2024
+"""
+
 import pandas as pd
 import numpy as np
 import tqdm
