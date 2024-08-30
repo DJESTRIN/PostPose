@@ -13,16 +13,18 @@ import numpy as np
 import tqdm
 from scipy.interpolate import interp1d
 import pickle
+import ipdb
 
 class ingestion():
     """ Breaks DLC output csv files into common components for analyses """
-    def __init__(self,csv_file,threshold=0.9,framerate=1):
+    def __init__(self,csv_file,drop_directory,threshold=0.9,framerate=1):
         self.raw_data = pd.read_csv(csv_file) # Read file into df
-        self.df = self.raw_data.iloc[1:,1:] #cut off unessesary data
+        self.df = self.raw_data.iloc[2:,1:] #cut off unessesary data
         self.data = self.df.to_numpy() #convert to numpy array
         self.data = self.data.astype(float) #numpy array MUST be floats, not string/objs
         self.threshold=threshold
         self.framerate=framerate #frames per second
+        self.drop_directory=drop_directory
 
     def __call__(self):
         self.get_probabilities()
@@ -31,7 +33,7 @@ class ingestion():
     def get_probabilities(self):
         """ Break up data into x, y, & p. 
         Replace low probability events with nan """
-        self.x,self.y,self.p=self.data[0::3],self.data[1::3],self.data[2::3] # Break up data into components
+        self.x,self.y,self.p=self.data[:,0::3],self.data[:,1::3],self.data[:,2::3] # Break up data into components
 
         # Replace low p with nan
         xup,yup=[],[]
@@ -39,7 +41,7 @@ class ingestion():
 
             xsoh,ysoh=[],[] #place holder list for updated data
             for x,y,p in tqdm.tqdm(zip(xs,ys,ps),total=len(xs)): #Loop over each point, tqdm shows progress bar
-                if p<self.treshold:
+                if p<self.threshold:
                     x=np.nan
                     y=np.nan
                 xsoh.append(x)
@@ -58,6 +60,9 @@ class ingestion():
         # Interpolate the X coordinates 
         x_interpolated=[]
         for bodypart in self.x.T: #loop over body parts
+            if np.all(np.isnan(bodypart)):
+                x_interpolated.append(bodypart)
+                continue
             x_real=np.arange(len(bodypart))[~np.isnan(bodypart)]
             y_real=bodypart[~np.isnan(bodypart)]
             infunc = interp1d(x_real,y_real,kind='linear',fill_value='extrapolate')
@@ -69,6 +74,9 @@ class ingestion():
         # Interpolate the Y coordinates
         y_interpolated=[]
         for bodypart in self.y.T: #loop over body parts
+            if np.all(np.isnan(bodypart)):
+                y_interpolated.append(bodypart)
+                continue
             x_real=np.arange(len(bodypart))[~np.isnan(bodypart)]
             y_real=bodypart[~np.isnan(bodypart)]
             infunc = interp1d(x_real,y_real,kind='linear',fill_value='extrapolate')
@@ -93,7 +101,7 @@ class digestion(ingestion):
         self.av_speed -- instantaneous speed calculated for average coordinates for all body parts
         self.av_acc_mag -- instantaneous acceleration magnitute calculated for average coordinates for all body parts
         """
-        super.__call__(self) # inherit call method above
+        super().__call__() # inherit call method above
         
         # Get metrics for each individual body part
         bp_distances,bp_speeds,bp_acc_mag=[],[],[]
@@ -109,8 +117,8 @@ class digestion(ingestion):
         self.bp_acc_mags = np.asarray(bp_acc_mag)
 
         # Calculate average coordinates for all body parts
-        self.x_av = np.nanmean(self.x,axis=0) #nan mean ignores nan
-        self.y_av = np.nanmean(self.y,axis=0)
+        self.x_av = np.nanmean(self.x,axis=1) #nan mean ignores nan
+        self.y_av = np.nanmean(self.y,axis=1)
 
         # Get metrics for average coordinates
         self.av_distance,self.av_speed,self.av_acc_mag = self.get_metrics(self.x_av,self.y_av)
@@ -124,12 +132,12 @@ class digestion(ingestion):
 
         speed=[]
         for d1,d2 in zip(distance[:-1],distance[1:]):
-            self.speed(d1,d2)
+            speed.append(self.speed(d1,d2))
         speed=np.asarray(speed)
         
         acc_mag=[]
         for s1,s2 in zip(speed[:-1],speed[1:]):
-            self.acceleration_mag(s1,s2)
+            acc_mag.append(self.acceleration_mag(s1,s2))
         acc_mag=np.asarray(acc_mag)
         return distance, speed, acc_mag
 
@@ -139,12 +147,11 @@ class digestion(ingestion):
     
     def speed(self,d1,d2):
         """ Returns speed for distances """
-        #???
-        return (d2-d1)*self.framerate ### Is this right? change in distance / change in time
+        return (d2+d1)*self.framerate 
 
     def acceleration_mag(self,s1,s2):
         """ Returns acceleration magnitute for speeds """
-        return (s2-s1)*self.framerate ### Is this right? Change in speed/ change in time
+        return (s2-s1)*self.framerate 
     
     @classmethod
     def load(cls,filename):
@@ -157,7 +164,45 @@ class digestion(ingestion):
         with open(filename, "wb") as file:
             pickle.dump(self, file)
 
-    def get_stat_timeseries(self,timestamps,data,type='mean'):
+    def get_stat(self,dependent_var,stat='mean'):
+        """ A method for quickly calculating common stats for data 
+        Inputs:
+        self -- contains all necessary attributes
+        dependent_var -- a N x 2 dimensional numpy array containing the start and end of timestamps for a given time of interest. Must contain 
+            at least 3 rows of data. Otherwise, will throw error
+        stat -- a string from the following list: ('mean','min','max','auc'). 'mean' will calculate the average amplitude of the dependent 
+            variable across timestamps. 'min' and 'max' will calculate the minimumn and maximumn amplitudes of the dependent varialbe
+            across timestamps, respectively. 'auc' will calculate the average area under the curve for the dependent variable during the give 
+            timestamps. Default value is 'mean'.
+
+        Outputs:
+        Value -- The final value given the input data and timestamps. 
+        StandardError -- A standard error is output in addition to the mean and auc. This is primarly meant for plotting
+            purposes. 
+        """
+        if stat=='mean':
+            Value = np.nanmean(dependent_var,axis=1) # Calculate the mean by row
+            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+            Value = np.nanmean(Value) # Calculate the overall mean        
+        elif stat=='max':
+            Value = np.nanmax(dependent_var,axis=1) # Calculate the mean by row
+            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+            Value = np.nanmean(Value) # Calculate the overall mean 
+        elif stat=='min':
+            Value = np.nanmin(dependent_var,axis=1) # Calculate the mean by row
+            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+            Value = np.nanmean(Value) # Calculate the overall mean 
+        elif stat=='auc':
+            try:
+                Value = np.trapz(dependent_var,axis=1) # Calculate the mean by row
+                StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+                Value = np.nanmean(Value) # Calculate the overall mean
+            except:
+                raise TypeError("When calculating the average AUC, an error occured with NaNs. Must modify code.")
+        
+        return Value, StandardError
+
+    def get_stat_timeseries(self,timestamps,data,stat='mean'):
         """ 
         A method for quickly calculating common stats for timeseries data. 
 
@@ -167,7 +212,7 @@ class digestion(ingestion):
             at least 3 rows of data. Otherwise, will throw error
         data -- a N x 2 dimensional numpy array containing data for the time (column 0) and dependent variable (column 1). The time is used
             in conjunction with the timestamps above to determine where the dependent variable should be parsed. 
-        type -- a string from the following list: ('mean','min','max','auc'). 'mean' will calculate the average amplitude of the dependent 
+        stat -- a string from the following list: ('mean','min','max','auc'). 'mean' will calculate the average amplitude of the dependent 
             variable across timestamps. 'min' and 'max' will calculate the minimumn and maximumn amplitudes of the dependent varialbe
             across timestamps, respectively. 'auc' will calculate the average area under the curve for the dependent variable during the give 
             timestamps. Default value is 'mean'.
@@ -202,28 +247,11 @@ class digestion(ingestion):
             dependent_var.append(data[np.where(data[:,0]>start and data[:,0]<stop)[0],1])
         dependent_var=np.asarray(dependent_var) # Convert list back to numpy
 
-        # Calculate the stat based on type
-        if type=='mean':
-            Value = np.nanmean(dependent_var,axis=1) # Calculate the mean by row
-            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
-            Value = np.nanmean(Value) # Calculate the overall mean        
-        elif type=='max':
-            Value = np.nanmax(dependent_var,axis=1) # Calculate the mean by row
-            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
-            Value = np.nanmean(Value) # Calculate the overall mean 
-        elif type=='min':
-            Value = np.nanmin(dependent_var,axis=1) # Calculate the mean by row
-            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
-            Value = np.nanmean(Value) # Calculate the overall mean 
-        elif type=='auc':
-            try:
-                Value = np.trapz(dependent_var,axis=1) # Calculate the mean by row
-                StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
-                Value = np.nanmean(Value) # Calculate the overall mean
-            except:
-                raise TypeError("When calculating the average AUC, an error occured with NaNs. Must modify code.")
-        
+        Value, StandardError = self.get_stat(dependent_var,stat)
         return Value, StandardError
 
-    def get_stat(self,):
-        b=2
+if __name__=='__main__':
+    objoh = digestion(r'C:\Users\listo\PostPose\test_data\24-7-2_C4478776_M2DLC_resnet50_open_fieldMay10shuffle1_200000.csv',
+                      r'C:\Users\listo\PostPose\test_data')
+    objoh()
+    ipdb.set_trace()
