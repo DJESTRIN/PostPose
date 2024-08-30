@@ -8,6 +8,11 @@ Version: 1.0
 Date: 08-29-2024
 """
 
+class build_experimental_field:
+    # Does the experiment include regions of interest (circles or squares)?
+        # Where are they and label them
+    # Grab an image of the experiment 
+
 class graphics():
     def __init__(self,digested_obj,drop_directory=[],video_file=[]):
         self.objoh=digested_obj #Get the digestion object
@@ -24,10 +29,21 @@ class graphics():
         else:
             self.attached_video=False
 
-    def forward(self):
+    def graphics_pipeline(self):
         # Need to code these in later
         self.plot_trajectory()
         self.plot_distance()
         self.plot_speed()
         self.plot_acceleration()
+
+    def plot_trajectory(self):
+        # If video is attached, pull and example image using random from the midle of the video
+        # Plot the image, if no image, skip
+        # Plot the x and y coordinates over the image
+        a=1
+
+    def plot_heatmap(self):
+        # Take method from plot_trajectory,
+        # bin the pixels for the heatmap
+        # plot heatmap instead of the line to show where the mouse generally was located on screen
     
