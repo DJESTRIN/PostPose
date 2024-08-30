@@ -7,14 +7,12 @@ Author: David Estrin, Kenneth Johnson
 Version: 1.0
 Date: 08-29-2024
 """
-
+# Import libraries and dependencies
 import pandas as pd
 import numpy as np
 import tqdm
 from scipy.interpolate import interp1d
 import pickle
-import os
-import ipdb
 
 class ingestion():
     """ Breaks DLC output csv files into common components for analyses """
@@ -159,7 +157,73 @@ class digestion(ingestion):
         with open(filename, "wb") as file:
             pickle.dump(self, file)
 
-if __name__=='__main__':
-    fileoh = ''
-    main(inputfile=fileoh,outputfile=r'\insert\some\directory\myobj.pkl')
+    def get_stat_timeseries(self,timestamps,data,type='mean'):
+        """ 
+        A method for quickly calculating common stats for timeseries data. 
 
+        Inputs:
+        self -- contains all necessary attributes
+        timestamps -- a N x 2 dimensional numpy array containing the start and end of timestamps for a given time of interest. Must contain 
+            at least 3 rows of data. Otherwise, will throw error
+        data -- a N x 2 dimensional numpy array containing data for the time (column 0) and dependent variable (column 1). The time is used
+            in conjunction with the timestamps above to determine where the dependent variable should be parsed. 
+        type -- a string from the following list: ('mean','min','max','auc'). 'mean' will calculate the average amplitude of the dependent 
+            variable across timestamps. 'min' and 'max' will calculate the minimumn and maximumn amplitudes of the dependent varialbe
+            across timestamps, respectively. 'auc' will calculate the average area under the curve for the dependent variable during the give 
+            timestamps. Default value is 'mean'.
+
+        Outputs:
+        Value -- The final value given the input data and timestamps. 
+        StandardError -- A standard error is output in addition to the mean and auc. This is primarly meant for plotting
+            purposes. 
+        """
+        # Determine if timestamp and data are numpy arrays
+        if not isinstance(timestamps,np.ndarray):
+            raise TypeError("timestamps must be a numpy array.")
+        if not isinstance(data,np.ndarray):
+            raise TypeError("data must be a numpy array.")
+        
+        # Determine if timestamps and data arrays are the correct shape
+        rows, cols = timestamps.shape
+        if rows < 3:
+            raise TypeError("timestamps must have at least 3 rows of data")
+        if cols!=2:
+            raise TypeError("timestamps must have 2 columns (start times,stop times)")
+        
+        rows, cols = data.shape
+        if rows < 3:
+            raise TypeError("data must have at least 3 rows of data")
+        if cols!=2:
+            raise TypeError("data must have 2 columns (time, dependent variable of interest)")
+        
+        # Loop over timestamps, parse data by time and collect dependent variable into new array. 
+        dependent_var=[]
+        for (start,stop) in timestamps:
+            dependent_var.append(data[np.where(data[:,0]>start and data[:,0]<stop)[0],1])
+        dependent_var=np.asarray(dependent_var) # Convert list back to numpy
+
+        # Calculate the stat based on type
+        if type=='mean':
+            Value = np.nanmean(dependent_var,axis=1) # Calculate the mean by row
+            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+            Value = np.nanmean(Value) # Calculate the overall mean        
+        elif type=='max':
+            Value = np.nanmax(dependent_var,axis=1) # Calculate the mean by row
+            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+            Value = np.nanmean(Value) # Calculate the overall mean 
+        elif type=='min':
+            Value = np.nanmin(dependent_var,axis=1) # Calculate the mean by row
+            StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+            Value = np.nanmean(Value) # Calculate the overall mean 
+        elif type=='auc':
+            try:
+                Value = np.trapz(dependent_var,axis=1) # Calculate the mean by row
+                StandardError = np.nanstd(Value)/np.sqrt(Value.size) # Calculate the SE of the rows
+                Value = np.nanmean(Value) # Calculate the overall mean
+            except:
+                raise TypeError("When calculating the average AUC, an error occured with NaNs. Must modify code.")
+        
+        return Value, StandardError
+
+    def get_stat(self,):
+        b=2
