@@ -52,27 +52,35 @@ class experimental_field:
 
         # If directory is a video, use openCV
         else:
-            cap = cv2.VideoCapture(video_dir)
-            if not cap.isOpened():
-                raise("Error: Could not open video file")
-            else:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-                _, example_image = cap.read()
-                cap.release()
+            try:
+                cap = cv2.VideoCapture(video_dir)
+                if not cap.isOpened():
+                    raise("Error: Could not open video file")
+                else:
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+                    _, example_image = cap.read()
+                    cap.release()
+            except:
+                # Output None if video breaks
+                example_image=None
 
         return example_image
 
     def build_experimental_field(self):
         """ Take shape data and convert it to an array of masks"""
-        # Is there an example image for experiment
-        # Are there any shapes?
-        # Make sure shape sizes match ... each circle has a midpoint...
-    
-        def shape_to_mask(image,shapeoh):
+        def shape_to_mask(image,shape_coordinates):
+            mask=np.zeros(image.shape)
+            mask[]
             # Convert example image to a mask for current shape.
             # 
-        
-        #  
+
+        if self.arena_image is None:
+            print("Cannot build arena without example image")
+        else:
+            if (self.shape_positions is None) or (self.shapes is None):
+                # Is there an example image for experiment
+                # Are there any shapes?
+                # Make sure shape sizes match ... each circle has a midpoint...         
 
 class graphics():
     def __init__(self,digested_obj,drop_directory=[],video_file=[]):
