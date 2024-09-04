@@ -131,13 +131,13 @@ class digestion(ingestion):
         distance=np.asarray(distance)
 
         speed=[]
-        for d1,d2 in zip(distance[:-1],distance[1:]):
+        for d1 in zip(distance[:-1]):
             speed.append(self.speed(d1,d2))
         speed=np.asarray(speed)
         
         acc_mag=[]
-        for s1,s2 in zip(speed[:-1],speed[1:]):
-            acc_mag.append(self.acceleration_mag(s1,s2))
+        for s1 in zip(speed[:-1]):
+            acc_mag.append(self.acceleration_mag(s1))
         acc_mag=np.asarray(acc_mag)
         return distance, speed, acc_mag
 
@@ -145,13 +145,14 @@ class digestion(ingestion):
         """ Returns distance for coordinates """
         return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     
-    def speed(self,d1,d2):
+    def speed(self,d1):
         """ Returns speed for distances """
-        return (d2+d1)*self.framerate 
+        self.frametime=1/self.framerate
+        return (d1)/self.frametime
 
-    def acceleration_mag(self,s1,s2):
+    def acceleration_mag(self,s1):
         """ Returns acceleration magnitute for speeds """
-        return (s2-s1)*self.framerate 
+        return (s1)/self.frametime 
     
     @classmethod
     def load(cls,filename):
