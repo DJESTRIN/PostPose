@@ -10,6 +10,7 @@ Date: 08-29-2024
 from PIL import Image
 import cv2 
 import numpy as np
+from skimage.draw import polygon
 
 class experimental_field:
     def __init__(self,shape_positions=None,shapes=None):
@@ -68,19 +69,50 @@ class experimental_field:
 
     def build_experimental_field(self):
         """ Take shape data and convert it to an array of masks"""
-        def shape_to_mask(image,shape_coordinates):
-            mask=np.zeros(image.shape)
-            mask[]
-            # Convert example image to a mask for current shape.
-            # 
+        # Custom function for creating a mask given a shape
+        def shape_to_mask(image,shape_coordinates,type):
+            # Create an empty image
+            height,width=image.shape
+            output_image=np.zeros((height,width),dtype=np.uint8)
 
+            # Determine if the shape is a circle 
+            if type=='circle':
+                (center_x, center_y, radius) = shape_coordinates 
+                y, x = np.ogrid[:height, :width]
+                mask = (x - center_x)**2 + (y - center_y)**2 <= radius**2
+                output_image[mask] = 1 
+            # Every other polygon
+            elif type=='polygon':
+                # Parse vertices
+                (xs,ys) = shape_coordinates
+                allx, ally = polygon(xs, ys)
+                output_image[allx, ally] = 1
+            # Throw error
+            else:
+                raise('This shape is not included for our code or may be misspelled')
+            
+            return output_image
+
+        def quick_plot_feild(image, shape_masks, alpha=0.6):
+            for shape_mask in shape_masks:
+                # Convert mask to red
+                (height, width) = shape_mask.shape
+                red_image = np.zeros((height, width, 3), dtype=np.uint8)
+                red_image[..., 0] = shape_mask * 255 * alpha
+
+
+                plt.
+        # Determine if arena image exists
         if self.arena_image is None:
             print("Cannot build arena without example image")
+
         else:
+            # Determine if all necessary information for shapes was given
             if (self.shape_positions is None) or (self.shapes is None):
-                # Is there an example image for experiment
-                # Are there any shapes?
-                # Make sure shape sizes match ... each circle has a midpoint...         
+               self.shape_masks=[]
+               for (typeoh,shape_coordinatesoh) in zip(self.shapes,self.shape_positions):
+                   self.shape_masks.append(shape_to_mask(self.arena_image,shape_coordinates=shape_coordinatesoh,type=typeoh))
+                    
 
 class graphics():
     def __init__(self,digested_obj,drop_directory=[],video_file=[]):
