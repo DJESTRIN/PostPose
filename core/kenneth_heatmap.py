@@ -25,5 +25,14 @@ def plot_heatmap(image,trajectory,drop_file): #Image is numpy array, trajectory 
     plt.imshow(trajectory, cmap='hot', alpha = 0.5,  interpolation= 'nearest')
 
     plt.savefig(drop_file)
+
+    #Generate a multiplot figure that has 2 colums and 2 tows and the first figure starts in the upper left. 
+    fig, axs = plt.subplot(2, 2, 1)
+    axs[0,0].plot(image)
+    axs[0,1].plot(trajectory)
+    axs[1,0].plot() #heatmap
+    axs[1,1].plot() #heatmap overlay
+
+
     return  
         
