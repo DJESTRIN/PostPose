@@ -13,38 +13,31 @@ def plot_heatmap(image,trajectory,drop_file): #Image is numpy array, trajectory 
     # plot shape if there is a shape...
     # Make sure coloring is consistent for all mice ... 
     # Save this as an image in a output folder.
+    # figure out how to keep x and y range using same cordinate system as image. 
 
-
-    # Plot the image 
-    plt.figure(figsize = (10,10))
-    plt.imshow(image)
-    plt.axis('off')  # Optional: Hide the axis
-
-    # Plot the trajectory as line 
-    plt.plot(trajectory[:,0],trajectory[:,1])
-
-
-    plt.savefig(drop_file)
+    
 
     #Generate a multiplot figure that has 2 colums and 2 tows and the first figure starts in the upper left. 
-    fig, axs = plt.subplot(2, 2, 1)
+    plt.figure()
+    fig, axs = plt.subplots(2,2)
     
     plt.subplot(2, 2, 1)
-    axs[0,0].imshow(image)
+    axs[0,0] = plt.imshow(image)
 
     plt.subplot(2, 2, 2)
-    axs[0,1].plot(trajectory)
+    axs[0,1] = plt.plot(trajectory[:,0],trajectory[:,1])
 
-    plt.subplot(2, 2, 3)
+    #plt.subplot(2, 2, 3)
     #code for heatmap
 
-    plt.subplot(2, 2, 4)
+    #plt.subplot(2, 2, 4)
     # code combined 
+    plt.savefig(drop_file)
     return  
 
 if __name__=='__main__':
     trajectoryoh=np.random.randint(1,200,size=(100,2))
-    image_dir=r'C:\Users\listo\PostPose\test_data\24-7-2_C4478776_M2.tif'
+    image_dir=r'C:\Users\Kenneth Johnosn\PostPose\test_data\24-7-2_C4478776_M2.tif'
     imageoh=Image.open(image_dir)
-    plot_heatmap(image=imageoh, trajectory=trajectoryoh, drop_file=r'C:\Users\listo\PostPose\test_data\example.tif')
-        
+    plot_heatmap(image=imageoh, trajectory=trajectoryoh, drop_file=r'C:\Users\Kenneth Johnosn\PostPose\test_data\example.tif')
+       
