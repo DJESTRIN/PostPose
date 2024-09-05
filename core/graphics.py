@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import os
 
 class experimental_field:
-    def __init__(self,drop_directory,shape_positions=None,shapes=None):
+    def __init__(self,input_video,drop_directory,shape_positions=None,shapes=None):
         """ Experimental_field
         Inputs:
             shape_positions -- A list containing the positions for each individual shape. Shape positions are to be included using
@@ -43,7 +43,7 @@ class experimental_field:
         self.drop_directory=drop_directory
 
         # Set up the class
-        self.arena_image=self.get_example_image()
+        self.arena_image=self.get_example_image(video_dir=input_video)
         self.build_experimental_field()
     
     def get_example_image(self,video_dir=r'C:\Users\listo\PostPose\core\test_data\24-7-2_C4478776_M2.tif',frame_number=100):
@@ -137,7 +137,7 @@ class experimental_field:
                quick_plot_field(self.arena_image,self.shape_masks,drop_file=drop_fileoh)
                     
 class graphics():
-    def __init__(self,digested_obj,arena_obj,drop_directory=[],video_file=[]):
+    def __init__(self,digested_obj,arena_obj,drop_directory=[]):
         # Set up attributes
         self.objoh=digested_obj #Get the digestion object
         self.arena_obj=arena_obj # Get the arena object created with experimental field class
@@ -149,9 +149,9 @@ class graphics():
             self.drop_directory=self.objoh.drop_directory # Use the same drop directory inside of the digestion object
 
         # Determine if video_file was attached
-        if video_file:
-            self.video_file=video_file
+        if hasattr(self.arena_obj,'arena_image'):
             self.attached_video=True
+            self.arena_image=self.arena_obj.arena_image
         else:
             self.attached_video=False
 

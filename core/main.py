@@ -9,10 +9,11 @@ Version: 1.0
 Date: 08-29-2024
 """
 
+# Import dependencies and libraries
 import argparse
 import os,glob
 from gestion import digestion
-from graphics import graphics
+from graphics import experimental_field, graphics
 
 class main:
     def __init__(self,root_dir):
@@ -41,6 +42,9 @@ class main:
             obj_oh = digestion(inputfile)
             obj_oh()
             obj_oh.save(outputfile)
+
+        # Set up experimental arena
+        arena_obj = experimental_field()
         
         # Generate graphics for current obj ... add in a loading feature later. 
         graph_obj = graphics(digestiondata=obj_oh)
