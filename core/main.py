@@ -44,6 +44,7 @@ class main:
             outputfile,_=csvfile.split('.cs')
             outputfile+='.pkl'
 
+            # Determine if object was already created on a previous run.
             if os.path.isfile(outputfile):
                 obj_oh = digestion.load(outputfile)
             else:
@@ -54,14 +55,18 @@ class main:
             # Get corresponding video file
             video_file = self.match_csv_to_video(csvfile)
 
+            """ NEED TO ADD IN WAY TO LOAD IN THESE OBJECTS IF ALREADY RUN """
+
             # Set up experimental arena
-            arena_obj = experimental_field(input_video=video_file,
+            arena_objoh = experimental_field(input_video=video_file,
                                            drop_directory=self.drop_directory,
                                            shape_positions=self.shape_positions,
                                            shapes=self.shapes)
         
             # Generate graphics for current obj ... add in a loading feature later. 
-            graph_obj = graphics(digestiondata=obj_oh)
+            graph_obj = graphics(digested_obj=obj_oh,
+                                 arena_obj=arena_objoh,
+                                 drop_directory=self.drop_directory)
 
 
 if __name__=='__main__':
