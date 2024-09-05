@@ -136,10 +136,12 @@ class experimental_field:
                drop_fileoh = os.path.join(self.drop_directory,'arena_mask_image.tif')
                quick_plot_field(self.arena_image,self.shape_masks,drop_file=drop_fileoh)
                     
-
 class graphics():
-    def __init__(self,digested_obj,drop_directory=[],video_file=[]):
+    def __init__(self,digested_obj,arena_obj,drop_directory=[],video_file=[]):
+        # Set up attributes
         self.objoh=digested_obj #Get the digestion object
+        self.arena_obj=arena_obj # Get the arena object created with experimental field class
+
         # Determine where figures will be dropped
         if drop_directory:
             self.drop_directory=drop_directory #Get the drop directory for figures
@@ -153,19 +155,34 @@ class graphics():
         else:
             self.attached_video=False
 
-    def graphics_pipeline(self):
+    def __call__(self):
         # Need to code these in later
-        self.plot_trajectory()
-        self.plot_distance()
-        self.plot_speed()
-        self.plot_acceleration()
+        self.plot_trajectory_and_heatmap()
 
-    def plot_trajectory(self):
+        # Plot common metrics
+        self.plot_metrics()
+
+    def plot_trajectory_and_heatmap(self):
         # If video is attached, pull and example image using random from the midle of the video
         # Plot the image, if no image, skip
         # Plot the x and y coordinates over the image
         a=1
 
-    def plot_heatmap(self):
-        #
-    
+    def plot_metrics(self):
+        """ Generates a figure for the distance, speed and 
+        acceleration magnitude for current gestation object """
+        # Generate figure
+        plt.figure(figsize=(10,10))
+        
+        # Plot distance
+        plt.subplot(1,3,1)
+        plt.plot(self.digested_obj.av_distance)
+
+        # Plot distance
+        plt.subplot(1,3,2)
+        plt.plot(self.digested_obj.av_speed)
+
+        # Plot acceleration magnitude
+        plt.subplot(1,3,3)
+        plt.plot(self.digested_obj.av_acc_mag)
+
