@@ -31,10 +31,6 @@ class main:
 
     def __call__(self):
         """ Main set of steps for current analysis. """
-        # Run digestion, or tst, or openfeild
-        # Run graphics
-        # Collect info?
-
         # Determine if csv file has been analyzed before, load in data if true
         if os.path.isfile(outputfile):
             obj_oh = digestion.load(outputfile)
