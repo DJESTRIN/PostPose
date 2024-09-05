@@ -11,9 +11,11 @@ from PIL import Image
 import cv2 
 import numpy as np
 from skimage.draw import polygon
+import matplotlib.pyplot as plt
+import os
 
 class experimental_field:
-    def __init__(self,shape_positions=None,shapes=None):
+    def __init__(self,drop_directory,shape_positions=None,shapes=None):
         """ Experimental_field
         Inputs:
             shape_positions -- A list containing the positions for each individual shape. Shape positions are to be included using
@@ -38,6 +40,7 @@ class experimental_field:
         # Set up class attributes
         self.shapes=shapes
         self.shape_positions=shape_positions
+        self.drop_directory=drop_directory
 
         # Set up the class
         self.arena_image=self.get_example_image()
@@ -93,15 +96,30 @@ class experimental_field:
             
             return output_image
 
-        def quick_plot_feild(image, shape_masks, alpha=0.6):
-            for shape_mask in shape_masks:
+        def quick_plot_field(image, shape_masks, drop_file, alpha=0.6):
+            for i,shape_mask in enumerate(shape_masks):
                 # Convert mask to red
                 (height, width) = shape_mask.shape
                 red_image = np.zeros((height, width, 3), dtype=np.uint8)
                 red_image[..., 0] = shape_mask * 255 * alpha
 
+                if i==0:
+                    fullmask=red_image
+                else:
+                    fullmask+=red_image
 
-                plt.
+            # convert main image to color
+            color_image = np.stack((image,)*3, axis=-1)
+
+            # Add main arena image and mask image together
+            final_image = color_image + fullmask
+
+            # Generate figure
+            plt.figure(figsize=(10,10))
+            plt.imshow(final_image)
+            plt.axis('off')
+            plt.savefig(drop_file)
+
         # Determine if arena image exists
         if self.arena_image is None:
             print("Cannot build arena without example image")
@@ -109,9 +127,14 @@ class experimental_field:
         else:
             # Determine if all necessary information for shapes was given
             if (self.shape_positions is None) or (self.shapes is None):
+               # Gather mask images as attribute
                self.shape_masks=[]
                for (typeoh,shape_coordinatesoh) in zip(self.shapes,self.shape_positions):
                    self.shape_masks.append(shape_to_mask(self.arena_image,shape_coordinates=shape_coordinatesoh,type=typeoh))
+
+               # Plot masks and arena image
+               drop_fileoh = os.path.join(self.drop_directory,'arena_mask_image.tif')
+               quick_plot_field(self.arena_image,self.shape_masks,drop_file=drop_fileoh)
                     
 
 class graphics():
