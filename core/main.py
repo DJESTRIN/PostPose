@@ -29,21 +29,39 @@ class main:
         current directory and put them in organized list """
         return glob.glob(f"{self.root_dir}/**/*{extension}", recursive=True)
 
+    def match_csv_to_video(self,csv_file):
+        video_file=1
+        return video_file
+    
+    def set_shapes(self,shape_positions,shapes):
+
+        a=2
+
     def __call__(self):
         """ Main set of steps for current analysis. """
-        # Determine if csv file has been analyzed before, load in data if true
-        if os.path.isfile(outputfile):
-            obj_oh = digestion.load(outputfile)
-        else:
-            obj_oh = digestion(inputfile)
-            obj_oh()
-            obj_oh.save(outputfile)
+        # Loop over csv files, making sure all csv files have been processed.
+        for csvfile in self.csv_files:
+            outputfile,_=csvfile.split('.cs')
+            outputfile+='.pkl'
 
-        # Set up experimental arena
-        arena_obj = experimental_field()
+            if os.path.isfile(outputfile):
+                obj_oh = digestion.load(outputfile)
+            else:
+                obj_oh = digestion(csv_file=csvfile)
+                obj_oh()
+                obj_oh.save(outputfile)
+
+            # Get corresponding video file
+            video_file = self.match_csv_to_video(csvfile)
+
+            # Set up experimental arena
+            arena_obj = experimental_field(input_video=video_file,
+                                           drop_directory=self.drop_directory,
+                                           shape_positions=self.shape_positions,
+                                           shapes=self.shapes)
         
-        # Generate graphics for current obj ... add in a loading feature later. 
-        graph_obj = graphics(digestiondata=obj_oh)
+            # Generate graphics for current obj ... add in a loading feature later. 
+            graph_obj = graphics(digestiondata=obj_oh)
 
 
 if __name__=='__main__':

@@ -1,16 +1,16 @@
 (1) Coming up with behavior specific code (TST, open field )
     - For open field, How do we calculate where center of FOV is and the number of crossings of center. 
-            - include plotting overlay so we know what the circle looks like
-            - define center with x and y coordinates and then define radius based on number of pixels/cms 
-            - boolean logic of if body part is inside of circle or not. 
-            - count number of times in and out based on logic above.
-            - Amount of time in center vs sides?
-            - speed/mag in center vs sides.
+        - include plotting overlay so we know what the circle looks like
+        - define center with x and y coordinates and then define radius based on number of pixels/cms 
+        - boolean logic of if body part is inside of circle or not. 
+        - count number of times in and out based on logic above.
+        - Amount of time in center vs sides?
+        - speed/mag in center vs sides.
+    
     - TST
 
-
 (3) Double check speed, distance and accel_mag functions make sense. 
-    - Kenneth?
+    - Kenneth - sum distances over some amount of time? 
     - Should the speed, distance and accel_mag be converted to centimeters? If so, we need a input at the beginning that converts pixels to cms. 
 
 (4) Include code to check if a file has already been run and skip if it has, unless manual override 
@@ -30,3 +30,8 @@
             else:
                 # run the code
 
+(5) Update main code so that it runs smoothly
+
+(6) Incorporate code that allows us to run stats and get final datasets
+
+(7) Test out on real data .... 
