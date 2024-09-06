@@ -43,6 +43,7 @@ class pipeline:
         # Loop over csv files, making sure all csv files have been processed.
         self.digestion_objs = []
         self.arena_objs = []
+
         for csvfile in self.csv_files:
             outputfile,_=csvfile.split('.cs')
             outputfile+='.pkl'
@@ -86,6 +87,20 @@ class pipeline:
                                     arena_obj=arena_objoh,
                                     drop_directory=self.drop_directory)
                 graph_obj.save(field_file)
+
+class generate_statistics(pipeline):
+    """ Generate statistics
+    Description: This class is meant to pull all of the important data from each digestion object across groups 
+        and capture statistics for each group. 
+    """
+    def __call__(self):
+        # Inherit previous call method from pipeline
+        super().__call__()
+
+        # Loop over digestion objects and pull data
+        for digobjoh in self.digestion_objs:
+            a=1
+
 
 if __name__=='__main__':
     # Parse command line inputs
