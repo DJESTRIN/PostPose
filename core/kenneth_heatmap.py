@@ -4,45 +4,35 @@ import seaborn as sns
 import ipdb
 import numpy as np
 from PIL import Image
+import matplotlib
 
-def plot_heatmap(image,trajectory,drop_file, alpha = 2, beta = 0): #Image is numpy array, trajectory is a numpy array (x and y coordinates for mouse)
-    # plot the image,
-    # plot the trajectory as a line
-    # plot heatmap of the trajectory as a heatmap. 
-        # There is a function for this...
-    # plot shape if there is a shape...
-    # Make sure coloring is consistent for all mice ... 
-    # Save this as an image in a output folder.
-    # figure out how to keep x and y range using same cordinate system as image. 
-
-    
-
-    #Generate a multiplot figure that has 2 colums and 2 tows and the first figure starts in the upper left. 
-    plt.figure()
-    fig, axs = plt.subplots(2,2)
+def plot_heatmap(image,trajectory,drop_file, alpha = 2, beta = 0): 
+    """ plot heatmap
+    ## add description later
+    """
     fig, axs = plt.subplots(2,2,figsize=(20,20),dpi=300)
-   # plt.subplots(figsize=(20,20),dpi=300)
+    
+    # Image of arena
     plt.subplot(2, 2, 1)
     image = np.round(np.array(image)*alpha+beta).astype(np.uint8)
     image = np.clip(image, 0, 255)
     axs[0,0] = plt.imshow(image)
 
+    # Trajectory
     plt.subplot(2, 2, 2)
     axs[0,1] = plt.plot(trajectory[:,0],trajectory[:,1])
-    axs[0, 1].sharex(axs[0, 0])
-    axs[0,1]
-    plt.subplot(2, 2, 1)
-    axs[0,0] = plt.imshow(image)
+    # axs[0, 1].sharex(axs[0, 0])
+    # axs[0,1]
 
-    plt.subplot(2, 2, 2)
+    # Image of arena plus heatmap
+    plt.subplot(2, 2, 3)
+    axs[1,1] = plt.imshow(image)
+    axs[1,1].hist2d(trajectory[:,0],trajectory[:,1], bins=100, norm=matplotlib.colors.LogNorm())
+
+    # Image of everything combined
+    plt.subplot(2, 2, 4)
     axs[0,1] = plt.plot(trajectory[:,0],trajectory[:,1])
 
-    #dave
-    #plt.subplot(2, 2, 3)
-    #code for heatmap
-
-    #plt.subplot(2, 2, 4)
-    # code combined 
     plt.savefig(drop_file)
     return  
 
