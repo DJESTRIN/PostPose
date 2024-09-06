@@ -13,6 +13,7 @@ import numpy as np
 from skimage.draw import polygon
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 class experimental_field:
     def __init__(self,input_video,drop_directory,shape_positions=None,shapes=None):
@@ -135,6 +136,17 @@ class experimental_field:
                # Plot masks and arena image
                drop_fileoh = os.path.join(self.drop_directory,'arena_mask_image.tif')
                quick_plot_field(self.arena_image,self.shape_masks,drop_file=drop_fileoh)
+
+    @classmethod
+    def load(cls,filename):
+        """Load an instance from a pickle file."""
+        with open(filename, "rb") as file:
+            return pickle.load(file)
+    
+    def save(self,filename):
+        """Save the instance to a file using pickle."""
+        with open(filename, "wb") as file:
+            pickle.dump(self, file)
                     
 class graphics():
     def __init__(self,digested_obj,arena_obj,drop_directory=[]):
@@ -185,4 +197,15 @@ class graphics():
         # Plot acceleration magnitude
         plt.subplot(1,3,3)
         plt.plot(self.digested_obj.av_acc_mag)
+    
+    @classmethod
+    def load(cls,filename):
+        """Load an instance from a pickle file."""
+        with open(filename, "rb") as file:
+            return pickle.load(file)
+    
+    def save(self,filename):
+        """Save the instance to a file using pickle."""
+        with open(filename, "wb") as file:
+            pickle.dump(self, file)
 
