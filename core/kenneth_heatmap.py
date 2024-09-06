@@ -27,6 +27,7 @@ def plot_heatmap(image,trajectory,drop_file): #Image is numpy array, trajectory 
     plt.subplot(2, 2, 2)
     axs[0,1] = plt.plot(trajectory[:,0],trajectory[:,1])
 
+    #dave
     #plt.subplot(2, 2, 3)
     #code for heatmap
 
