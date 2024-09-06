@@ -14,6 +14,7 @@ import argparse
 import os,glob
 from gestion import digestion
 from graphics import experimental_field, graphics
+import re
 
 class main:
     def __init__(self,root_dir):
@@ -55,18 +56,28 @@ class main:
             # Get corresponding video file
             video_file = self.match_csv_to_video(csvfile)
 
-            """ NEED TO ADD IN WAY TO LOAD IN THESE OBJECTS IF ALREADY RUN """
-
-            # Set up experimental arena
-            arena_objoh = experimental_field(input_video=video_file,
+            # Create or load corresponding arena object
+            field_file,_=re.split(r'\.avi|\.mp4', video_file)
+            field_file+='experimental_field.pkl'
+            if os.path.isfile(field_file):
+                arena_objoh = experimental_field.load(field_file)
+            else:
+                arena_objoh = experimental_field(input_video=video_file,
                                            drop_directory=self.drop_directory,
                                            shape_positions=self.shape_positions,
-                                           shapes=self.shapes)
+                                           shapes=self.shape)
+                arena_objoh.save(field_file)
         
-            # Generate graphics for current obj ... add in a loading feature later. 
-            graph_obj = graphics(digested_obj=obj_oh,
-                                 arena_obj=arena_objoh,
-                                 drop_directory=self.drop_directory)
+            # Create or load graphics object
+            graphics_file,_=re.split(r'\.avi|\.mp4', video_file)
+            graphics_file+='graphics.pkl'
+            if os.path.isfile(graphics_file):
+                graph_obj = graphics.load(graphics_file)
+            else:
+                graph_obj = graphics(digested_obj=obj_oh,
+                                    arena_obj=arena_objoh,
+                                    drop_directory=self.drop_directory)
+                graph_obj.save(field_file)
 
 
 if __name__=='__main__':
