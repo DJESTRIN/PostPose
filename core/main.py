@@ -16,7 +16,7 @@ from gestion import digestion
 from graphics import experimental_field, graphics
 import re
 
-class main:
+class pipeline:
     def __init__(self,root_dir):
         self.root_dir=root_dir
 
@@ -41,6 +41,8 @@ class main:
     def __call__(self):
         """ Main set of steps for current analysis. """
         # Loop over csv files, making sure all csv files have been processed.
+        self.digestion_objs = []
+        self.arena_objs = []
         for csvfile in self.csv_files:
             outputfile,_=csvfile.split('.cs')
             outputfile+='.pkl'
@@ -52,6 +54,9 @@ class main:
                 obj_oh = digestion(csv_file=csvfile)
                 obj_oh()
                 obj_oh.save(outputfile)
+            
+            # Keep all digestion objects inside of a single attribute
+            self.digestion_objs.append(obj_oh)
 
             # Get corresponding video file
             video_file = self.match_csv_to_video(csvfile)
@@ -68,6 +73,9 @@ class main:
                                            shapes=self.shape)
                 arena_objoh.save(field_file)
         
+            # Keep all arena objects inside a single attribute
+            self.arena_objs.append(arena_objoh)
+
             # Create or load graphics object
             graphics_file,_=re.split(r'\.avi|\.mp4', video_file)
             graphics_file+='graphics.pkl'
@@ -79,7 +87,6 @@ class main:
                                     drop_directory=self.drop_directory)
                 graph_obj.save(field_file)
 
-
 if __name__=='__main__':
     # Parse command line inputs
     parser=argparse.ArgumentParser()
@@ -87,7 +94,7 @@ if __name__=='__main__':
     args=parser.parse_args()
 
     # Set up main object 
-    parimaryobject=main(root_dir=args.root_directory)
+    parimaryobject=pipeline(root_dir=args.root_directory)
 
     # Run main object
     parimaryobject()
