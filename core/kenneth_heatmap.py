@@ -20,7 +20,17 @@ def plot_heatmap(image,trajectory,drop_file): #Image is numpy array, trajectory 
     #Generate a multiplot figure that has 2 colums and 2 tows and the first figure starts in the upper left. 
     plt.figure()
     fig, axs = plt.subplots(2,2)
-    
+    fig, axs = plt.subplots(2,2,figsize=(20,20),dpi=300)
+   # plt.subplots(figsize=(20,20),dpi=300)
+    plt.subplot(2, 2, 1)
+    image = np.round(np.array(image)*alpha+beta).astype(np.uint8)
+    image = np.clip(image, 0, 255)
+    axs[0,0] = plt.imshow(image)
+
+    plt.subplot(2, 2, 2)
+    axs[0,1] = plt.plot(trajectory[:,0],trajectory[:,1])
+    axs[0, 1].sharex(axs[0, 0])
+    axs[0,1]
     plt.subplot(2, 2, 1)
     axs[0,0] = plt.imshow(image)
 
