@@ -5,7 +5,7 @@ import ipdb
 import numpy as np
 from PIL import Image
 
-def plot_heatmap(image,trajectory,drop_file): #Image is numpy array, trajectory is a numpy array (x and y coordinates for mouse)
+def plot_heatmap(image,trajectory,drop_file, alpha = 2, beta = 0): #Image is numpy array, trajectory is a numpy array (x and y coordinates for mouse)
     # plot the image,
     # plot the trajectory as a line
     # plot heatmap of the trajectory as a heatmap. 
