@@ -21,11 +21,18 @@ import ipdb
 class pipeline:
     def __init__(self,root_dir):
         self.root_dir=root_dir
+        self.drop_directory=self.get_dropdirectory(root_dir=self.root_dir)
 
         # Get all files of interest
         self.video_files=self.find_files(extension='.mp4')
         self.csv_files=self.find_files(extension='.csv')
         self.custom_objects=self.find_files(extension='.pkl')
+ 
+    def get_dropdirectory(self,root_dir):
+        subdirectory_path = os.path.join(root_dir, 'results')
+        if not os.path.exists(subdirectory_path):
+            os.makedirs(subdirectory_path)
+        return subdirectory_path
 
     def find_files(self,extension=".csv"):
         """ find all files of interest (csv, video, etc) in 
@@ -39,8 +46,8 @@ class pipeline:
         return video_file
     
     def set_shapes(self,shape_positions,shapes):
-
-        a=2
+        self.shape_positions=shape_positions
+        self.shapes=shapes
 
     def __call__(self):
         """ Main set of steps for current analysis. """
@@ -72,10 +79,11 @@ class pipeline:
             if os.path.isfile(field_file):
                 arena_objoh = experimental_field.load(field_file)
             else:
+                ipdb.set_trace()
                 arena_objoh = experimental_field(input_video=video_file,
                                            drop_directory=self.drop_directory,
                                            shape_positions=self.shape_positions,
-                                           shapes=self.shape)
+                                           shapes=self.shapes)
                 arena_objoh.save(field_file)
         
             # Keep all arena objects inside a single attribute
