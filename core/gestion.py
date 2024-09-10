@@ -17,14 +17,13 @@ import ipdb
 
 class ingestion():
     """ Breaks DLC output csv files into common components for analyses """
-    def __init__(self,csv_file,drop_directory,threshold=0.9,framerate=1):
+    def __init__(self,csv_file,threshold=0.9,framerate=1):
         self.raw_data = pd.read_csv(csv_file) # Read file into df
         self.df = self.raw_data.iloc[2:,1:] #cut off unessesary data
         self.data = self.df.to_numpy() #convert to numpy array
         self.data = self.data.astype(float) #numpy array MUST be floats, not string/objs
         self.threshold=threshold
         self.framerate=framerate #frames per second
-        self.drop_directory=drop_directory
 
     def __call__(self):
         self.get_probabilities()
@@ -132,7 +131,7 @@ class digestion(ingestion):
 
         speed=[]
         for d1 in zip(distance[:-1]):
-            speed.append(self.speed(d1,d2))
+            speed.append(self.speed(d1))
         speed=np.asarray(speed)
         
         acc_mag=[]
@@ -148,11 +147,11 @@ class digestion(ingestion):
     def speed(self,d1):
         """ Returns speed for distances """
         self.frametime=1/self.framerate
-        return (d1)/self.frametime
+        return d1[0]/self.frametime
 
     def acceleration_mag(self,s1):
         """ Returns acceleration magnitute for speeds """
-        return (s1)/self.frametime 
+        return s1[0]/self.frametime 
     
     @classmethod
     def load(cls,filename):

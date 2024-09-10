@@ -15,6 +15,8 @@ import os,glob
 from gestion import digestion
 from graphics import experimental_field, graphics
 import re
+import difflib
+import ipdb
 
 class pipeline:
     def __init__(self,root_dir):
@@ -31,7 +33,9 @@ class pipeline:
         return glob.glob(f"{self.root_dir}/**/*{extension}", recursive=True)
 
     def match_csv_to_video(self,csv_file):
-        video_file=1
+        original_videos = [s for s in self.video_files if 'resnet' not in s.lower()] # removes any of the labeled videos from list
+        matches = difflib.get_close_matches(csv_file, original_videos, n=1)
+        video_file=matches[0]
         return video_file
     
     def set_shapes(self,shape_positions,shapes):
@@ -113,3 +117,5 @@ if __name__=='__main__':
 
     # Run main object
     parimaryobject()
+
+    #C:\Users\listo\Downloads\test_data_for_videos
