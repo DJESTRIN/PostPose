@@ -113,6 +113,16 @@ class generate_statistics(pipeline):
         for digobjoh in self.digestion_objs:
             a=1
 
+def delete_saved_objects(root_dir):
+    """ Delete save objects
+    Find objects in root directory and then delete the pkl files. 
+    """
+    objsoh = glob.glob(os.path.join(root_dir,'*.pkl'))
+    for objoh in objsoh:
+        try:
+            os.remove(objoh)
+        except:
+            print(f'The following object was not found: {objoh}')
 
 if __name__=='__main__':
     # Parse command line inputs
