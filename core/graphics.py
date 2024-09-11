@@ -14,6 +14,8 @@ from skimage.draw import polygon
 import matplotlib.pyplot as plt
 import os
 import pickle
+import re
+import ipdb
 
 class experimental_field:
     def __init__(self,input_video,drop_directory,shape_positions=None,shapes=None):
@@ -45,12 +47,27 @@ class experimental_field:
 
         # Set up the class
         self.arena_image=self.get_example_image(video_dir=input_video)
+        self.objectnames(video_dir=input_video)
+        self.__str__() # Get string name and print it
         self.build_experimental_field()
-    
+
+    def __str__(self):
+        stringoh = f'CAGE{self.cage}_MOUSE{self.mouse}'
+        self.string=stringoh
+        return stringoh
+
+    def objectnames(self,video_dir,pattern = r'_C(\d+)_M(\d+)'):
+        matches = re.search(pattern, video_dir)
+        if matches:
+            self.cage = matches.group(1)  # Extracts C4478776
+            self.mouse = matches.group(2)  # Extracts M2
+        else:
+            print('problem')
+
     def get_example_image(self,video_dir=r'C:\Users\listo\PostPose\core\test_data\24-7-2_C4478776_M2.tif',frame_number=100):
         """ Given a video directory, open up an example image """
         # Determine if directory is actually an image or a video
-        if video_dir.endswith('.tiff','.tif','.jpg'):
+        if video_dir.endswith(('.tiff','.tif','.jpg')):
             print('Building experimental field with image, not a video')
             example_image=Image.open(video_dir)
             example_image=np.array(example_image)
@@ -68,7 +85,7 @@ class experimental_field:
             except:
                 # Output None if video breaks
                 example_image=None
-
+        
         return example_image
 
     def build_experimental_field(self):
@@ -76,17 +93,17 @@ class experimental_field:
         # Custom function for creating a mask given a shape
         def shape_to_mask(image,shape_coordinates,type):
             # Create an empty image
-            height,width=image.shape
+            height,width,depth=image.shape
             output_image=np.zeros((height,width),dtype=np.uint8)
 
             # Determine if the shape is a circle 
-            if type=='circle':
+            if type[0]=='circle':
                 (center_x, center_y, radius) = shape_coordinates 
                 y, x = np.ogrid[:height, :width]
                 mask = (x - center_x)**2 + (y - center_y)**2 <= radius**2
                 output_image[mask] = 1 
             # Every other polygon
-            elif type=='polygon':
+            elif type[0]=='polygon':
                 # Parse vertices
                 (xs,ys) = shape_coordinates
                 allx, ally = polygon(xs, ys)
@@ -97,7 +114,7 @@ class experimental_field:
             
             return output_image
 
-        def quick_plot_field(image, shape_masks, drop_file, alpha=0.6):
+        def quick_plot_field(image, shape_masks, drop_file, alpha=0.4):
             for i,shape_mask in enumerate(shape_masks):
                 # Convert mask to red
                 (height, width) = shape_mask.shape
@@ -110,7 +127,10 @@ class experimental_field:
                     fullmask+=red_image
 
             # convert main image to color
-            color_image = np.stack((image,)*3, axis=-1)
+            if len(image.shape) == 2:
+                color_image = np.stack((image,)*3, axis=-1)
+            else:
+                color_image = image
 
             # Add main arena image and mask image together
             final_image = color_image + fullmask
@@ -120,6 +140,7 @@ class experimental_field:
             plt.imshow(final_image)
             plt.axis('off')
             plt.savefig(drop_file)
+            return 
 
         # Determine if arena image exists
         if self.arena_image is None:
@@ -127,14 +148,14 @@ class experimental_field:
 
         else:
             # Determine if all necessary information for shapes was given
-            if (self.shape_positions is None) or (self.shapes is None):
+            if (self.shape_positions is not None) or (self.shapes is not None):
                # Gather mask images as attribute
                self.shape_masks=[]
                for (typeoh,shape_coordinatesoh) in zip(self.shapes,self.shape_positions):
                    self.shape_masks.append(shape_to_mask(self.arena_image,shape_coordinates=shape_coordinatesoh,type=typeoh))
 
                # Plot masks and arena image
-               drop_fileoh = os.path.join(self.drop_directory,'arena_mask_image.tif')
+               drop_fileoh = os.path.join(self.drop_directory,f'{self.string}_arena_mask_image.tif')
                quick_plot_field(self.arena_image,self.shape_masks,drop_file=drop_fileoh)
 
     @classmethod
@@ -151,14 +172,14 @@ class experimental_field:
 class graphics():
     def __init__(self,digested_obj,arena_obj,drop_directory=[]):
         # Set up attributes
-        self.objoh=digested_obj #Get the digestion object
+        self.digested_obj=digested_obj #Get the digestion object
         self.arena_obj=arena_obj # Get the arena object created with experimental field class
 
         # Determine where figures will be dropped
         if drop_directory:
             self.drop_directory=drop_directory #Get the drop directory for figures
         else:
-            self.drop_directory=self.objoh.drop_directory # Use the same drop directory inside of the digestion object
+            self.drop_directory=self.digested_obj.drop_directory # Use the same drop directory inside of the digestion object
 
         # Determine if video_file was attached
         if hasattr(self.arena_obj,'arena_image'):
@@ -180,7 +201,7 @@ class graphics():
         # Plot the x and y coordinates over the image
         a=1
 
-    def plot_metrics(self):
+    def plot_metrics(self,downsample=1000):
         """ Generates a figure for the distance, speed and 
         acceleration magnitude for current gestation object """
         # Generate figure
@@ -188,15 +209,20 @@ class graphics():
         
         # Plot distance
         plt.subplot(1,3,1)
-        plt.plot(self.digested_obj.av_distance)
+        plt.plot(self.digested_obj.av_distance[::downsample])
 
         # Plot distance
         plt.subplot(1,3,2)
-        plt.plot(self.digested_obj.av_speed)
+        plt.plot(self.digested_obj.av_speed[::downsample])
 
         # Plot acceleration magnitude
         plt.subplot(1,3,3)
-        plt.plot(self.digested_obj.av_acc_mag)
+        plt.plot(self.digested_obj.av_acc_mag[::downsample])
+
+        # save file
+        print(self.digested_obj)
+        output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_metricsgraph.jpg')
+        plt.savefig(output_path)
     
     @classmethod
     def load(cls,filename):

@@ -79,11 +79,10 @@ class pipeline:
             if os.path.isfile(field_file):
                 arena_objoh = experimental_field.load(field_file)
             else:
-                ipdb.set_trace()
                 arena_objoh = experimental_field(input_video=video_file,
                                            drop_directory=self.drop_directory,
-                                           shape_positions=self.shape_positions,
-                                           shapes=self.shapes)
+                                           shape_positions=self.shape_positions[0],
+                                           shapes=self.shapes[0])
                 arena_objoh.save(field_file)
         
             # Keep all arena objects inside a single attribute
@@ -98,6 +97,7 @@ class pipeline:
                 graph_obj = graphics(digested_obj=obj_oh,
                                     arena_obj=arena_objoh,
                                     drop_directory=self.drop_directory)
+                graph_obj()
                 graph_obj.save(field_file)
 
 class generate_statistics(pipeline):
@@ -121,9 +121,12 @@ if __name__=='__main__':
     args=parser.parse_args()
 
     # Set up main object 
-    parimaryobject=pipeline(root_dir=args.root_directory)
+    primaryobject=pipeline(root_dir=args.root_directory)
+
+    # set shapes
+    primaryobject.set_shapes(shape_positions=[[[360,260,200]]],shapes=[[['circle']]])
 
     # Run main object
-    parimaryobject()
+    primaryobject()
 
     #C:\Users\listo\Downloads\test_data_for_videos

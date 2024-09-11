@@ -13,6 +13,7 @@ import numpy as np
 import tqdm
 from scipy.interpolate import interp1d
 import pickle
+import re
 import ipdb
 
 class ingestion():
@@ -24,10 +25,24 @@ class ingestion():
         self.data = self.data.astype(float) #numpy array MUST be floats, not string/objs
         self.threshold=threshold
         self.framerate=framerate #frames per second
+        self.objectnames(csv_file=csv_file)
 
     def __call__(self):
         self.get_probabilities()
         self.interpolate()
+    
+    def __str__(self):
+        stringoh = f'CAGE{self.cage}_MOUSE{self.mouse}'
+        self.string=stringoh
+        return stringoh
+
+    def objectnames(self,csv_file,pattern = r'_C(\d+)_M(\d+)'):
+        matches = re.search(pattern, csv_file)
+        if matches:
+            self.cage = matches.group(1)  # Extracts C4478776
+            self.mouse = matches.group(2)  # Extracts M2
+        else:
+            print('problem')
 
     def get_probabilities(self):
         """ Break up data into x, y, & p. 
