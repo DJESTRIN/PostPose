@@ -12,7 +12,8 @@ from main import pipeline, delete_saved_objects
 from graphics import graphics, experimental_field
 import argparse
 import numpy as np
-import os
+import os, re
+import matplotlib.pyplot as plt
 import ipdb
 
 class openfield_graphics(graphics):
@@ -24,6 +25,37 @@ class openfield_graphics(graphics):
         (3) Average distance traveled, speed and acceleration magnitude of body (part) inside inner circle
             versus outer circle. Default is average of all body parts.
     """
+    def __call__(self):
+        super().__call__()
+        self.calculate_percent_time()
+
+    def is_inside_circle(self,x_trajectory,y_trajectory, x_center, y_center, radius):
+        distances_squared = (x_trajectory - x_center) ** 2 + (y_trajectory - y_center) ** 2
+        return distances_squared <= radius ** 2
+
+    def calculate_percent_time(self,x=None,y=None):
+        if (x is None) or (y is None): 
+            x=self.digested_obj.x[:,0] ### NEED TO FIX THIS...
+            y=self.digested_obj.y[:,0]
+        
+        # Eliminate points outside of outter circle
+        x_center,y_center,radius=self.arena_obj.shape_positions[0]
+        boolout = self.is_inside_circle(x_trajectory=x,y_trajectory=y,x_center=x_center,y_center=y_center,radius=radius)
+        x,y=x[boolout],y[boolout]
+
+        # Determine which points are inside inner circle
+        x_center,y_center,radius=self.arena_obj.shape_positions[1]
+        boolout = self.is_inside_circle(x_trajectory=x,y_trajectory=y,x_center=x_center,y_center=y_center,radius=radius)
+        x_inner,y_inner=x[boolout],y[boolout]
+        x_outer,y_outer=x[~boolout],y[~boolout]
+        
+        # Map True/False to colors: True -> 'red', False -> 'blue'
+        plt.figure()
+        plt.plot(x_outer,y_outer)
+        plt.plot(x_inner,y_inner)
+        plt.show()
+        ipdb.set_trace()
+
 
 class openfield_pipeline(pipeline):
     """ Updated pipeline class to accomodate openfield_graphics class """
@@ -70,9 +102,9 @@ class openfield_pipeline(pipeline):
             graphics_file,_=re.split(r'\.avi|\.mp4', video_file)
             graphics_file+='graphics.pkl'
             if os.path.isfile(graphics_file):
-                graph_obj = graphics.load(graphics_file)
+                graph_obj = openfield_graphics.load(graphics_file)
             else:
-                graph_obj = graphics(digested_obj=obj_oh,
+                graph_obj = openfield_graphics(digested_obj=obj_oh,
                                     arena_obj=arena_objoh,
                                     drop_directory=self.drop_directory)
                 graph_obj()
@@ -98,13 +130,15 @@ if __name__=='__main__':
     # Parse command line inputs
     parser=argparse.ArgumentParser()
     parser.add_argument('--root_directory',type=str,required=True)
+    parser.add_argument('--force', action='store_true', help="Delete previos objects and recalculate them")
     args=parser.parse_args()
 
     # Delete previously made objects
-    delete_saved_objects(root_dir=args.root_directory)
+    if args.force:
+        delete_saved_objects(root_dir=args.root_directory)
 
     # Set up main object 
-    primaryobject=pipeline(root_dir=args.root_directory)
+    primaryobject=openfield_pipeline(root_dir=args.root_directory)
 
     # set shapes
     shapesoh,shapestringsoh = generate_openfield_shapes(input_circle_shape=[[[360,260,200]]],input_shape_string=[[['circle']]])
