@@ -1,37 +1,27 @@
-(1) Coming up with behavior specific code (TST, open field )
-    - For open field, How do we calculate where center of FOV is and the number of crossings of center. 
-        - include plotting overlay so we know what the circle looks like
-        - define center with x and y coordinates and then define radius based on number of pixels/cms 
-        - boolean logic of if body part is inside of circle or not. 
-        - count number of times in and out based on logic above.
-        - Amount of time in center vs sides?
-        - speed/mag in center vs sides.
-    
-    - TST
+(1) Update all metric code to convert pixels to cms
+    - Everything should be with respect to cms. This will also help us validate the metrics look correct. 
 
-(3) Double check speed, distance and accel_mag functions make sense. 
-    - Kenneth - sum distances over some amount of time? 
-    - Should the speed, distance and accel_mag be converted to centimeters? If so, we need a input at the beginning that converts pixels to cms. 
+(2) Distance, speed and acc mag still look weird. Why are they all very similar? Should we do the binning and if so, what should
+    that look like?
 
-(4) Include code to check if a file has already been run and skip if it has, unless manual override 
-    - David & 
+(3) Issues with some body part tracking data. Some body parts tracking data looks not great.. Do we re-track or do we delete these body parts?
 
-    import os
+(4) Is there anything special needed for the TST and head fixed analysis? Or does distance and speed suffice?
+    -Head fixed needs to have a way to look at metrics before and after trials ....
 
-    listoffiles=['/path/to/file.csv']
-    output_file_extension='.pkl'
+(5) How are we going to parse videos by day? 
+    -Maybe I can write a function (which is hard coded) to rename files 
+        Ex. 08_14 ==> BaselineDay1 ?
 
-    def run_files(list_of_files,output_file_extension):
-        for file in list_of_files:
-            basename,_=file.split('.cs')
-            basename+=output_file_extension
-            if os.path.isfile(basename)  # True or False
-                continue
-            else:
-                # run the code
+(6) Is there a reason why we would need to pull all data for each subject into a single object file?
+    - What is most reusable for the future?
+    - Is this unnecessary? 
 
-(5) Update main code so that it runs smoothly
+(7) Incorporate code that allows us to run stats and get final datasets. 
+    - What should the final dataset look like?
+        (A) A pickled object file that is parsable? Easiest to implement but harder for non-coders
+        (B) A table. Really hard to implement because there are so many ways a table could be made. 
 
-(6) Incorporate code that allows us to run stats and get final datasets
+    - Should statistics be run in python? I am thinking yes. 
 
-(7) Test out on real data .... 
+(8) What is the organization of the real data right now?
