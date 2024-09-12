@@ -29,8 +29,7 @@ class openfield_graphics(graphics):
         super().__call__()
         self.calculate_percent_time()
         self.number_entries_innercircle = self.calculate_transitions_innercircle()
-        self.circle_metrics()
-        ipdb.set_trace()
+        #self.circle_metrics()
 
     def is_inside_circle(self,x_trajectory,y_trajectory, x_center, y_center, radius):
         distances_squared = (x_trajectory - x_center) ** 2 + (y_trajectory - y_center) ** 2
@@ -88,6 +87,7 @@ class openfield_pipeline(pipeline):
         # Loop over csv files, making sure all csv files have been processed.
         self.digestion_objs = []
         self.arena_objs = []
+        self.graphics_objs=[]
 
         for csvfile in self.csv_files:
             outputfile,_=csvfile.split('.cs')
@@ -133,6 +133,22 @@ class openfield_pipeline(pipeline):
                                     drop_directory=self.drop_directory)
                 graph_obj()
                 graph_obj.save(field_file)
+            
+            # Keep all graphics objects inside a single attribute
+            self.graphics_objs.append(graph_obj)
+
+class openfield_statistics(openfield_pipeline):
+    """ Generate statistics
+    Description: This class is meant to pull all of the important data from each digestion object across groups 
+        and capture statistics for each group. 
+    """
+    def __call__(self):
+        # Inherit previous call method from pipeline
+        super().__call__()
+
+        # Loop over digestion objects and pull data
+        for digobjoh in self.graphics_objs:
+            ipdb.set_trace()
 
 def generate_openfield_shapes(input_circle_shape,input_shape_string,percent=0.75):
     """ Generate openfield shapes """
@@ -162,7 +178,7 @@ if __name__=='__main__':
         delete_saved_objects(root_dir=args.root_directory)
 
     # Set up main object 
-    primaryobject=openfield_pipeline(root_dir=args.root_directory)
+    primaryobject=openfield_statistics(root_dir=args.root_directory)
 
     # set shapes
     shapesoh,shapestringsoh = generate_openfield_shapes(input_circle_shape=[[[360,260,200]]],input_shape_string=[[['circle']]])
@@ -170,3 +186,4 @@ if __name__=='__main__':
 
     # Run main object
     primaryobject()
+    ipdb.set_trace()

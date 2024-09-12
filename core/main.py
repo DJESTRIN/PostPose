@@ -16,6 +16,7 @@ from gestion import digestion
 from graphics import experimental_field, graphics
 import re
 import difflib
+import pickle
 import ipdb
 
 class pipeline:
@@ -99,6 +100,17 @@ class pipeline:
                                     drop_directory=self.drop_directory)
                 graph_obj()
                 graph_obj.save(field_file)
+    
+    @classmethod
+    def load(cls,filename):
+        """Load an instance from a pickle file."""
+        with open(filename, "rb") as file:
+            return pickle.load(file)
+    
+    def save(self,filename):
+        """Save the instance to a file using pickle."""
+        with open(filename, "wb") as file:
+            pickle.dump(self, file)
 
 class generate_statistics(pipeline):
     """ Generate statistics
