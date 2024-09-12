@@ -37,8 +37,8 @@ class openfield_graphics(graphics):
 
     def calculate_percent_time(self,x=None,y=None):
         if (x is None) or (y is None): 
-            x=self.digested_obj.x[:,1] ### NEED TO FIX THIS...
-            y=self.digested_obj.y[:,1]
+            x=self.digested_obj.x_av ### NEED TO FIX THIS...
+            y=self.digested_obj.y_av
         
         # Eliminate points outside of outter circle
         x_center,y_center,radius=self.arena_obj.shape_positions[0]
@@ -54,6 +54,11 @@ class openfield_graphics(graphics):
         self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
         self.percent_time_outer=len(x_outer)/(len(x_inner)+len(x_outer))
         self.inner_circle_boolean=boolout
+
+        plt.figure()
+        plt.plot(x_outer,y_outer)
+        plt.plot(x_inner,y_inner)
+        plt.show()
 
     def calculate_transitions_innercircle(self):
         transitions = np.where((self.inner_circle_boolean[:-1] == False) & (self.inner_circle_boolean[1:] == True))[0]
@@ -79,6 +84,7 @@ class openfield_graphics(graphics):
         acc_outer = self.digested_obj.av_acc_mag[~self.inner_circle_boolean[:-3]]
         self.average_acc_inner=np.mean(acc_inner) # In pixels ==> NEED TO CONVERT TO CM
         self.average_acc_outer=np.mean(acc_outer)
+        ipdb.set_trace()
 
 class openfield_pipeline(pipeline):
     """ Updated pipeline class to accomodate openfield_graphics class """
