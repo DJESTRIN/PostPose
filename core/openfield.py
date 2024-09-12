@@ -29,6 +29,8 @@ class openfield_graphics(graphics):
         super().__call__()
         self.calculate_percent_time()
         self.number_entries_innercircle = self.calculate_transitions_innercircle()
+        self.circle_metrics()
+        ipdb.set_trace()
 
     def is_inside_circle(self,x_trajectory,y_trajectory, x_center, y_center, radius):
         distances_squared = (x_trajectory - x_center) ** 2 + (y_trajectory - y_center) ** 2
@@ -57,6 +59,27 @@ class openfield_graphics(graphics):
     def calculate_transitions_innercircle(self):
         transitions = np.where((self.inner_circle_boolean[:-1] == False) & (self.inner_circle_boolean[1:] == True))[0]
         return len(transitions)
+    
+    def circle_metrics(self):
+        """ circle metrics: re-calculate the distance, speed and acceleration_mag 
+            inside the inner circle versus outer circle """
+        # Calculate cumulative distance in inner vs outer circle
+        distance_inner = self.digested_obj.av_distance[self.inner_circle_boolean[:-1]]
+        distance_outer = self.digested_obj.av_distance[~self.inner_circle_boolean[:-1]]
+        self.total_distance_inner=np.sum(distance_inner) # In pixels ==> NEED TO CONVERT TO CM
+        self.total_distance_outer=np.sum(distance_outer)
+
+        # Calculate average speed in inner vs outer circle
+        speed_inner = self.digested_obj.av_speed[self.inner_circle_boolean[:-2]]
+        speed_outer = self.digested_obj.av_speed[~self.inner_circle_boolean[:-2]]
+        self.average_speed_inner=np.mean(speed_inner) # In pixels ==> NEED TO CONVERT TO CM
+        self.average_speed_outer=np.mean(speed_outer)
+
+        # Calculate average acceleration magnitude in inner vs outer circle
+        acc_inner = self.digested_obj.av_acc_mag[self.inner_circle_boolean[:-3]]
+        acc_outer = self.digested_obj.av_acc_mag[~self.inner_circle_boolean[:-3]]
+        self.average_acc_inner=np.mean(acc_inner) # In pixels ==> NEED TO CONVERT TO CM
+        self.average_acc_outer=np.mean(acc_outer)
 
 class openfield_pipeline(pipeline):
     """ Updated pipeline class to accomodate openfield_graphics class """
