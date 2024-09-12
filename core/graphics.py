@@ -24,11 +24,10 @@ class experimental_field:
             shape_positions -- A list containing the positions for each individual shape. Shape positions are to be included using
                 the following format.
                     Circle -- three values are expected per circle (X,Y,R). An X and Y midpoint coordinate and R radius.
-                    Rectangle -- four values are expected per rectangle (X1,Y1,X2,Y2). 
                     polygon -- For all other shapes (triangle, rombus, octagon, etc) use the polygon option. For the polygon option,
                         include the X and Y coordinates for each corner of the shape (X1,Y1,X2,X2 ... (Xn,Yn))
 
-            shapes -- A string or list of strings based on the following selection: 'circle','rectangle','polygon'.
+            shapes -- A string or list of strings based on the following selection: 'circle','polygon'.
                 For each shape, a certain number of vertices are expected inside of the shape positions array. 
         
         Intermediates:
@@ -189,14 +188,9 @@ class graphics():
             self.attached_video=False
 
     def __call__(self):
-        # Correct trajectories
-        self.correct_trajectories()
-
-        # Need to code these in later
-        self.plot_trajectory_and_heatmap()
-
-        # Plot common metrics
-        self.plot_metrics()
+        self.correct_trajectories() # Correct trajectories
+        self.plot_trajectory_and_heatmap() # Need to code these in later
+        self.plot_metrics() # Plot common metrics
 
     def correct_trajectories(self):
         """ Correct trajectories - Using the arena image information, this method cuts off 
@@ -214,12 +208,6 @@ class graphics():
         # Save over x and y digested attributes
         self.digested_obj.x=np.asarray(newxs).T
         self.digested_obj.y=np.asarray(newys).T
-
-        # plt.figure()
-        # plt.plot(self.digested_obj.x[:,6],self.digested_obj.y[:,6])
-        # plt.show()
-
-        # ipdb.set_trace()
 
     def plot_trajectory_and_heatmap(self):
         # If video is attached, pull and example image using random from the midle of the video
