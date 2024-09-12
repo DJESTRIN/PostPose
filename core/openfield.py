@@ -28,6 +28,7 @@ class openfield_graphics(graphics):
     def __call__(self):
         super().__call__()
         self.calculate_percent_time()
+        self.number_entries_innercircle = self.calculate_transitions_innercircle()
 
     def is_inside_circle(self,x_trajectory,y_trajectory, x_center, y_center, radius):
         distances_squared = (x_trajectory - x_center) ** 2 + (y_trajectory - y_center) ** 2
@@ -35,8 +36,8 @@ class openfield_graphics(graphics):
 
     def calculate_percent_time(self,x=None,y=None):
         if (x is None) or (y is None): 
-            x=self.digested_obj.x[:,0] ### NEED TO FIX THIS...
-            y=self.digested_obj.y[:,0]
+            x=self.digested_obj.x[:,1] ### NEED TO FIX THIS...
+            y=self.digested_obj.y[:,1]
         
         # Eliminate points outside of outter circle
         x_center,y_center,radius=self.arena_obj.shape_positions[0]
@@ -49,13 +50,13 @@ class openfield_graphics(graphics):
         x_inner,y_inner=x[boolout],y[boolout]
         x_outer,y_outer=x[~boolout],y[~boolout]
         
-        # Map True/False to colors: True -> 'red', False -> 'blue'
-        plt.figure()
-        plt.plot(x_outer,y_outer)
-        plt.plot(x_inner,y_inner)
-        plt.show()
-        ipdb.set_trace()
+        self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
+        self.percent_time_outer=len(x_outer)/(len(x_inner)+len(x_outer))
+        self.inner_circle_boolean=boolout
 
+    def calculate_transitions_innercircle(self):
+        transitions = np.where((self.inner_circle_boolean[:-1] == False) & (self.inner_circle_boolean[1:] == True))[0]
+        return len(transitions)
 
 class openfield_pipeline(pipeline):
     """ Updated pipeline class to accomodate openfield_graphics class """

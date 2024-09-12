@@ -189,11 +189,37 @@ class graphics():
             self.attached_video=False
 
     def __call__(self):
+        # Correct trajectories
+        self.correct_trajectories()
+
         # Need to code these in later
         self.plot_trajectory_and_heatmap()
 
         # Plot common metrics
         self.plot_metrics()
+
+    def correct_trajectories(self):
+        """ Correct trajectories - Using the arena image information, this method cuts off 
+            data points outside of image range. """
+        max_height,max_width,_ = self.arena_obj.arena_image.shape
+
+        newxs=[]
+        newys=[]
+        for bpx,bpy in zip(self.digested_obj.x.T,self.digested_obj.y.T):
+            bpx = np.where((bpx < 0) | (bpx > max_width), np.nan, bpx)
+            bpy = np.where((bpy < 0) | (bpy > max_height), np.nan, bpy)
+            newxs.append(bpx)
+            newys.append(bpy)
+
+        # Save over x and y digested attributes
+        self.digested_obj.x=np.asarray(newxs).T
+        self.digested_obj.y=np.asarray(newys).T
+
+        # plt.figure()
+        # plt.plot(self.digested_obj.x[:,6],self.digested_obj.y[:,6])
+        # plt.show()
+
+        # ipdb.set_trace()
 
     def plot_trajectory_and_heatmap(self):
         # If video is attached, pull and example image using random from the midle of the video
