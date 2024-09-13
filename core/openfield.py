@@ -153,7 +153,13 @@ class openfield_statistics(openfield_pipeline):
         super().__call__()
 
         # Loop over digestion objects and pull data
+        number_entries_innercircle=[]
         for digobjoh in self.graphics_objs:
+            """ Pull Data + make table ...
+            Cage, SubjectID, Day (0,7?, 14,30), Cohort (1,2,np.nan), Group (cort, control), Behavior (open_field),  
+                number_entries_innercircle, percent time inner circle, percent time outer circle, distance_inner_circle, distance_outer_circle,
+                speed_inner_circle, speed_outer_circle, acc_mag_inner_circle, acc_mag_outer_circle
+            """
             ipdb.set_trace()
 
 def generate_openfield_shapes(input_circle_shape,input_shape_string,percent=0.75):
