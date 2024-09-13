@@ -18,7 +18,7 @@ import ipdb
 
 class ingestion():
     """ Breaks DLC output csv files into common components for analyses """
-    def __init__(self,csv_file,threshold=0.9,framerate=1):
+    def __init__(self,csv_file,threshold=0.9,framerate=1,cms_per_pixel=1,rolling_window=None):
         self.raw_data = pd.read_csv(csv_file) # Read file into df
         self.df = self.raw_data.iloc[2:,1:] #cut off unessesary data
         self.data = self.df.to_numpy() #convert to numpy array
@@ -26,6 +26,8 @@ class ingestion():
         self.threshold=threshold
         self.framerate=framerate #frames per second
         self.objectnames(csv_file=csv_file)
+        self.cms_per_pixel=cms_per_pixel
+        self.rolling_window=rolling_window
 
     def __call__(self):
         self.get_probabilities()
@@ -136,12 +138,21 @@ class digestion(ingestion):
 
         # Get metrics for average coordinates
         self.av_distance,self.av_speed,self.av_acc_mag = self.get_metrics(self.x_av,self.y_av)
+
+        if self.rolling_window is not None:
+            def rolling_average(arr, window_size):
+                weights = np.ones(window_size) / window_size
+                return np.convolve(arr, weights, mode='valid')
+            
+            self.av_distance = rolling_average(self.av_distance,self.rolling_window)
+            self.av_speed = rolling_average(self.av_speed,self.rolling_window)
+            self.av_acc_mag = rolling_average(self.av_acc_mag,self.rolling_window)
     
     def get_metrics(self,xs,ys):
         """ Calculates the distance, speed and acceleration magnitute for any input coordinate data """
         distance=[] # Get distance
         for x1,x2,y1,y2 in zip(xs[:-1],xs[1:],ys[:-1],ys[1:]):
-            distance.append(self.distance(x1,x2,y1,y2))
+            distance.append(self.distance(x1,x2,y1,y2,cms_per_pixel=self.cms_per_pixel))
         distance=np.asarray(distance)
 
         speed=[]
@@ -150,23 +161,22 @@ class digestion(ingestion):
         speed=np.asarray(speed)
         
         acc_mag=[]
-        for s1 in zip(speed[:-1]):
-            acc_mag.append(self.acceleration_mag(s1))
+        for s1,s2 in zip(speed[:-1],speed[1:]):
+            acc_mag.append(self.acceleration_mag(s1,s2))
         acc_mag=np.asarray(acc_mag)
         return distance, speed, acc_mag
 
-    def distance(self,x1,x2,y1,y2):
+    def distance(self,x1,x2,y1,y2,cms_per_pixel):
         """ Returns distance for coordinates """
-        return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)*cms_per_pixel
     
     def speed(self,d1):
         """ Returns speed for distances """
-        self.frametime=1/self.framerate
-        return d1[0]/self.frametime
+        return d1[0]*self.framerate
 
-    def acceleration_mag(self,s1):
+    def acceleration_mag(self,s1,s2):
         """ Returns acceleration magnitute for speeds """
-        return s1[0]/self.frametime 
+        return (s2-s1)*self.framerate
     
     @classmethod
     def load(cls,filename):

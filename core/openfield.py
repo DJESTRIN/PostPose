@@ -103,7 +103,7 @@ class openfield_pipeline(pipeline):
             if os.path.isfile(outputfile):
                 obj_oh = digestion.load(outputfile)
             else:
-                obj_oh = digestion(csv_file=csvfile)
+                obj_oh = digestion(csv_file=csvfile,framerate=60,cms_per_pixel=0.245,rolling_window=60)
                 obj_oh()
                 obj_oh.save(outputfile)
             
@@ -186,7 +186,7 @@ if __name__=='__main__':
     # Set up main object 
     primaryobject=openfield_statistics(root_dir=args.root_directory)
 
-    # set shapes
+    # set shapes 
     shapesoh,shapestringsoh = generate_openfield_shapes(input_circle_shape=[[[360,260,200]]],input_shape_string=[[['circle']]])
     primaryobject.set_shapes(shape_positions=shapesoh,shapes=shapestringsoh)
 

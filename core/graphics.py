@@ -215,22 +215,22 @@ class graphics():
         # Plot the x and y coordinates over the image
         a=1
 
-    def plot_metrics(self,downsample=1000):
+    def plot_metrics(self,downsample=1):
         """ Generates a figure for the distance, speed and 
         acceleration magnitude for current gestation object """
         # Generate figure
         plt.figure(figsize=(10,10))
         
         # Plot distance
-        plt.subplot(1,3,1)
+        plt.subplot(3,1,1)
         plt.plot(self.digested_obj.av_distance[::downsample])
 
         # Plot distance
-        plt.subplot(1,3,2)
+        plt.subplot(3,1,2)
         plt.plot(self.digested_obj.av_speed[::downsample])
 
         # Plot acceleration magnitude
-        plt.subplot(1,3,3)
+        plt.subplot(3,1,3)
         plt.plot(self.digested_obj.av_acc_mag[::downsample])
 
         # save file
