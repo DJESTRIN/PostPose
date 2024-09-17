@@ -55,11 +55,6 @@ class openfield_graphics(graphics):
         self.percent_time_outer=len(x_outer)/(len(x_inner)+len(x_outer))
         self.inner_circle_boolean=boolout
 
-        plt.figure()
-        plt.plot(x_outer,y_outer)
-        plt.plot(x_inner,y_inner)
-        plt.show()
-
     def calculate_transitions_innercircle(self):
         transitions = np.where((self.inner_circle_boolean[:-1] == False) & (self.inner_circle_boolean[1:] == True))[0]
         return len(transitions)

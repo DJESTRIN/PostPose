@@ -209,11 +209,75 @@ class graphics():
         self.digested_obj.x=np.asarray(newxs).T
         self.digested_obj.y=np.asarray(newys).T
 
-    def plot_trajectory_and_heatmap(self):
+    def plot_trajectory_and_heatmap(self,alpha=2,beta=0):
         # If video is attached, pull and example image using random from the midle of the video
         # Plot the image, if no image, skip
         # Plot the x and y coordinates over the image
-        a=1
+
+        # Generate figure
+        fig, axs = plt.subplots(nrows=2,ncols=2,figsize=(10,10),dpi=200,constrained_layout=True)
+
+        # Plot image of arena
+        image = self.arena_obj.arena_image  # Get arena image
+        image = np.round(np.array(image)*alpha+beta).astype(np.uint8) # change brightness/contrast
+        image = np.clip(image, 0, 255) # change brightness
+        max_x,max_y,_=image.shape
+        axs[0,0].imshow(image)
+
+        for spine in axs[0,0].spines.values():
+            spine.set_visible(False)
+
+        axs[0,0].set_xticks([])
+        axs[0,0].set_yticks([])
+        axs[0,0].set_xticklabels([])
+        axs[0,0].set_yticklabels([])
+
+        # Plot trajectory
+        axs[0,1].plot(self.digested_obj.x_av,self.digested_obj.y_av,color='black')
+        axs[0,1].set_xlim(0,max_x)
+        axs[0,1].set_xlim(0,max_y)
+
+        for spine in axs[0,1].spines.values():
+            spine.set_visible(False)
+        
+        axs[0,1].set_xticks([])
+        axs[0,1].set_yticks([])
+        axs[0,1].set_xticklabels([])
+        axs[0,1].set_yticklabels([])
+
+        # Plot heatmap
+        axs[1,0].hist2d(self.digested_obj.x_av,self.digested_obj.y_av, bins=30,cmin=1, cmap='plasma')
+        axs[1,0].set_xlim(0,max_x)
+        axs[1,0].set_xlim(0,max_y)
+
+        for spine in axs[1,0].spines.values():
+            spine.set_visible(False)
+        
+        axs[1,0].set_xticks([])
+        axs[1,0].set_yticks([])
+        axs[1,0].set_xticklabels([])
+        axs[1,0].set_yticklabels([])
+
+        # Combine all plots
+        # im=axs[1,1].imshow(image)
+        hb=axs[1,1].hist2d(self.digested_obj.x_av,self.digested_obj.y_av, bins=30,cmin=1, cmap='plasma')
+        axs[1,1].plot(self.digested_obj.x_av,self.digested_obj.y_av,alpha=0.5,color='black')
+        im=axs[1,1].imshow(image)
+        axs[0,1].set_xlim(0,max_x)
+        axs[0,1].set_xlim(0,max_y)
+
+        for spine in axs[1,1].spines.values():
+            spine.set_visible(False)
+
+        axs[1,1].set_xticks([])
+        axs[1,1].set_yticks([])
+        axs[1,1].set_xticklabels([])
+        axs[1,1].set_yticklabels([])
+    
+        plt.tight_layout()
+        print(self.digested_obj)
+        output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_heatmaps.jpg')
+        plt.savefig(output_path)
 
     def plot_metrics(self,downsample=1):
         """ Generates a figure for the distance, speed and 
