@@ -14,6 +14,8 @@ import argparse
 import numpy as np
 import os, re
 import matplotlib.pyplot as plt
+from statsmodels.formula.api import mixedlm
+import pandas as pd
 import ipdb
 
 class openfield_graphics(graphics):
@@ -155,6 +157,20 @@ class openfield_statistics(openfield_pipeline):
                 number_entries_innercircle, percent time inner circle, percent time outer circle, distance_inner_circle, distance_outer_circle,
                 speed_inner_circle, speed_outer_circle, acc_mag_inner_circle, acc_mag_outer_circle
             """
+            ipdb.set_trace()
+            
+            # Example data
+            exampledata = {
+                'Subject': [1, 1, 2, 2, 3, 3],
+                'Group': ['A', 'B', 'A', 'B', 'A', 'B'],
+                'Session': ['day1', 'day1', 'day1', 'day2', 'day2', 'day2'],
+                'Entries': [5.1, 6.2, 5.5, 6.0, 5.8, 6.1]}
+            df = pd.DataFrame(exampledata)
+
+            # Perform repeated measures ANOVA
+            model = mixedlm("Entries~Session*Group",df, groups=df["Subject"])
+            res = model.fit()
+
             ipdb.set_trace()
 
 def generate_openfield_shapes(input_circle_shape,input_shape_string,percent=0.75):
