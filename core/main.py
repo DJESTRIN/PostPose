@@ -26,6 +26,8 @@ class pipeline:
 
         # Get all files of interest
         self.video_files=self.find_files(extension='.mp4')
+        if not self.video_files:
+            self.video_files=self.find_files(extension='.avi')
         self.csv_files=self.find_files(extension='.csv')
         self.custom_objects=self.find_files(extension='.pkl')
  
