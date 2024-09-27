@@ -19,14 +19,10 @@ from statsmodels.formula.api import mixedlm
 import pandas as pd
 import ipdb
 
-class openfield_graphics(graphics):
-    """ Openfield graphics ... uses graphics class to calculate the following details:
-        (1) Count number of times body (part) passes from inner to outer circle (vice versa). 
-            Default is average of all body parts.
-        (2) Percent of time body (part) spends inside inner circle versus outer circle. 
-            Default is average of all body parts.
-        (3) Average distance traveled, speed and acceleration magnitude of body (part) inside inner circle
-            versus outer circle. Default is average of all body parts.
+class headrestricted_graphics(graphics):
+    """ head restricted graphics ... uses graphics class to calculate the following details:
+        (1) Calculate movement metrics (velocity, distance, acceleration) of body and body parts. 
+        (2) Calculate movement metrics before and after each trial ...  
     """
     def __call__(self):
         super().__call__()

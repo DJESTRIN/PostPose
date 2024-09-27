@@ -1,11 +1,3 @@
-(1) Update all metric code to convert pixels to cms
-    - Everything should be with respect to cms. This will also help us validate the metrics look correct. 
-    - The diameter of the circle in centimeters is: 19.25 inches ==> 49 cms
-
-(2) Distance, speed and acc mag still look weird. Why are they all very similar? 
-    Should we do the binning and if so, what should that look like?
-    Do together... 
-
 (3) Is there anything special needed for the TST and head fixed analysis? Or does distance and speed suffice?
     -Head fixed needs to have a way to look at metrics before and after trials ....
 
@@ -14,7 +6,7 @@
         Ex. 08_14 ==> BaselineDay1 ?
         Rename files to include day0, day7?, day14, day30
         Rename files to include groups: cort, control
-        Ex : 24-09-12_day0_cort_C4629531_M1_front ....
+        Ex. 24-09-12_day0_cort_C4629531_M1_front ....
 
 (5) Is there a reason why we would need to pull all data for each subject into a single object file?
     - What is most reusable for the future?
@@ -28,3 +20,4 @@
     - Should statistics be run in python? I am thinking yes. 
 
 (7) What is the organization of the real data right now?
+    - get more example data from Kenneth. 

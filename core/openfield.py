@@ -93,7 +93,6 @@ class openfield_pipeline(pipeline):
         self.graphics_objs=[]
 
         for csvfile in self.csv_files:
-            ipdb.set_trace()
             outputfile,_=csvfile.split('.cs')
             outputfile+='.pkl'
 
