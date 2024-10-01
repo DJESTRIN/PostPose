@@ -43,7 +43,6 @@ class openfield_graphics(graphics):
             y=self.digested_obj.y_av
         
         # Eliminate points outside of outter circle
-        ipdb.set_trace()
         x_center,y_center,radius=self.arena_obj.shape_positions[0]
         boolout = self.is_inside_circle(x_trajectory=x,y_trajectory=y,x_center=x_center,y_center=y_center,radius=radius)
         x,y=x[boolout],y[boolout]
@@ -95,13 +94,13 @@ class openfield_pipeline(pipeline):
 
         for csvfile in self.csv_files:
             outputfile,_=csvfile.split('.cs')
-            outputfile+='.pkl'
+            outputfile+='digestion.pkl'
 
             # Determine if object was already created on a previous run.
             if os.path.isfile(outputfile):
                 obj_oh = digestion.load(outputfile)
             else:
-                obj_oh = digestion(csv_file=csvfile,framerate=60,cms_per_pixel=0.245,rolling_window=60)
+                obj_oh = digestion(csv_file = csvfile,framerate=60,cms_per_pixel=0.245,rolling_window=60)
                 obj_oh()
                 obj_oh.save(outputfile)
             
@@ -151,44 +150,39 @@ class openfield_statistics(openfield_pipeline):
             given the list of independent variables.
         """
         self.tables=[] # a list of all pandas tables
-        
+
         for depend in dependent_variables: # Loop over dependent variables
             for i,digobjoh in enumerate(self.graphics_objs): # Loop over digestion objects and pull data
                 if hasattr(digobjoh,depend):
-
-                    missing_attributes = [attr for attr in independent_variables if not hasattr(digobjoh, attr)]
+                    missing_attributes = [attr for attr in independent_variables if not hasattr(digobjoh.digested_obj, attr)]
+                    
                     if missing_attributes:
                         print("missing attributes:", missing_attributes)
                         raise("Missing independent variables as attributes, must look at your spelling or if independent variables not generated")
                     else:
-                        attribute_values = [getattr(digobjoh, attr, None) for attr in independent_variables]
+                        attribute_values = [getattr(digobjoh.digested_obj, attr, None) for attr in independent_variables]
+                        depend_values = getattr(digobjoh,depend)
 
                         # Append data to dataframe 
                         if i==0:
-                            table_f=pd.DataFrame({})
+                            data_oh = {'cage':attribute_values[0],
+                                       'animal':attribute_values[1],
+                                       'day':attribute_values[2],
+                                       'group':attribute_values[3],
+                                        f'{depend}':depend_values}
+                            table_f=pd.DataFrame([data_oh])
                         else:
-                            table_oh=[]
-                            table_f+=table_oh
+                            data_oh = {'cage':attribute_values[0],
+                                       'animal':attribute_values[1],
+                                       'day':attribute_values[2],
+                                       'group':attribute_values[3],
+                                        f'{depend}':depend_values}
+                            table_oh=pd.DataFrame([data_oh])
+                            table_f = pd.concat([table_f, table_oh], ignore_index=True)
                 else:
                     raise("Dependent variable is not an attribute")
-                
-            self.tables.append(table_f)
-
-        # for digobjoh in self.graphics_objs:
-        #     """ Pull Data + make table ...
-        #     Cage, SubjectID, Day (0,7?, 14,30), Cohort (1,2,np.nan), Group (cort, control), Behavior (open_field),  
-        #         number_entries_innercircle, percent time inner circle, percent time outer circle, distance_inner_circle, distance_outer_circle,
-        #         speed_inner_circle, speed_outer_circle, acc_mag_inner_circle, acc_mag_outer_circle
-        #     """
-        #     ipdb.set_trace()
-            
-        #     # Example data
-        #     exampledata = {
-        #         'Subject': [1, 1, 2, 2, 3, 3],
-        #         'Group': ['A', 'B', 'A', 'B', 'A', 'B'],
-        #         'Session': ['day1', 'day1', 'day1', 'day2', 'day2', 'day2'],
-        #         'Entries': [5.1, 6.2, 5.5, 6.0, 5.8, 6.1]}
-        #     df = pd.DataFrame(exampledata)
+                  
+            self.tables.append(table_f) # Put all tables into a list
 
     def models(self):
         self.models=[]
@@ -231,7 +225,7 @@ if __name__=='__main__':
         delete_saved_objects(root_dir=args.root_directory)
 
     # Set up main object 
-    primaryobject=openfield_pipeline(root_dir=args.root_directory)
+    primaryobject=openfield_statistics(root_dir=args.root_directory)
 
     # set shapes 
     shapesoh,shapestringsoh = generate_openfield_shapes(input_circle_shape=[[[360,260,200]]],input_shape_string=[[['circle']]])
@@ -239,4 +233,10 @@ if __name__=='__main__':
 
     # Run main object
     primaryobject()
+
+    # Build data tables
+    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer"])
+
+    # Run statistical analyses 
     ipdb.set_trace()
+    primaryobject.models()

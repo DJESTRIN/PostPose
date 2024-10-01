@@ -40,6 +40,7 @@ class experimental_field:
         """
 
         # Set up class attributes
+        self.input_video=input_video
         self.shapes=shapes
         self.shape_positions=shape_positions
         self.drop_directory=drop_directory
@@ -55,12 +56,16 @@ class experimental_field:
         self.string=stringoh
         return stringoh
 
-    def objectnames(self,video_dir,pattern = r'_day-(\d+)_C(\d+)_M(\d+)'):
+    def objectnames(self,video_dir,pattern = r'day-(\d+)_C(\d+)_M(\d+)'):
         matches = re.search(pattern, video_dir)
         if matches:
-            self.day = matches.group(1)
+            self.day = matches.group(1) # Extracts day 
             self.cage = matches.group(2)  # Extracts C4478776
             self.mouse = matches.group(3)  # Extracts M2
+            if '_cort_' in video_dir:
+                self.group='cort'
+            else:
+                self.group='control'
         else:
             print('problem')
 
@@ -277,7 +282,6 @@ class graphics():
     
         plt.tight_layout()
         print(self.digested_obj)
-        ipdb.set_trace()
         output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_heatmaps.jpg')
         plt.savefig(output_path)
 

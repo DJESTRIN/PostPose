@@ -25,7 +25,8 @@ class ingestion():
         self.data = self.data.astype(float) #numpy array MUST be floats, not string/objs
         self.threshold=threshold
         self.framerate=framerate #frames per second
-        self.objectnames(csv_file=csv_file)
+        self.csv_file=csv_file
+        self.objectnames()
         self.cms_per_pixel=cms_per_pixel
         self.rolling_window=rolling_window
 
@@ -34,17 +35,21 @@ class ingestion():
         self.interpolate()
     
     def __str__(self):
-        ipdb.set_trace()
-        stringoh = f'CAGE{self.cage}_MOUSE{self.mouse}_DAY{self.day}'
+        stringoh = f'CAGE{self.cage}_MOUSE{self.mouse}_DAY{self.day}_GROUP{self.group}'
         self.string=stringoh
         return stringoh
 
-    def objectnames(self,csv_file,pattern = r'_day-(\d+)_C(\d+)_M(\d+)'):
-        matches = re.search(pattern, csv_file)
+    def objectnames(self, pattern = r'day-(\d+)_C(\d+)_M(\d+)'):
+        matches = re.search(pattern, self.csv_file)
         if matches:
-            self.day = matches.group(1)
+            self.day = matches.group(1) # Extracts day 
             self.cage = matches.group(2)  # Extracts C4478776
             self.mouse = matches.group(3)  # Extracts M2
+            if '_cort_' in self.csv_file:
+                self.group='CORT'
+            else:
+                ipdb.set_trace()
+                self.group='CONTROL'
         else:
             print('problem')
 

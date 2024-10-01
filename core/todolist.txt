@@ -16,8 +16,10 @@
     - What should the final dataset look like?
         (A) A pickled object file that is parsable? Easiest to implement but harder for non-coders
         (B) A table. Really hard to implement because there are so many ways a table could be made. 
-
     - Should statistics be run in python? I am thinking yes. 
 
 (7) What is the organization of the real data right now?
     - get more example data from Kenneth. 
+
+(8) Add in an upper stop to the amount of time... 
+(9) Put the tables into csv ...
