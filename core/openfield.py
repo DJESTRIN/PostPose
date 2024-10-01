@@ -43,6 +43,7 @@ class openfield_graphics(graphics):
             y=self.digested_obj.y_av
         
         # Eliminate points outside of outter circle
+        ipdb.set_trace()
         x_center,y_center,radius=self.arena_obj.shape_positions[0]
         boolout = self.is_inside_circle(x_trajectory=x,y_trajectory=y,x_center=x_center,y_center=y_center,radius=radius)
         x,y=x[boolout],y[boolout]
@@ -135,7 +136,7 @@ class openfield_pipeline(pipeline):
                                     arena_obj=arena_objoh,
                                     drop_directory=self.drop_directory)
                 graph_obj()
-                graph_obj.save(field_file)
+                #graph_obj.save(field_file)
             
             # Keep all graphics objects inside a single attribute
             self.graphics_objs.append(graph_obj)

@@ -34,15 +34,17 @@ class ingestion():
         self.interpolate()
     
     def __str__(self):
-        stringoh = f'CAGE{self.cage}_MOUSE{self.mouse}'
+        ipdb.set_trace()
+        stringoh = f'CAGE{self.cage}_MOUSE{self.mouse}_DAY{self.day}'
         self.string=stringoh
         return stringoh
 
-    def objectnames(self,csv_file,pattern = r'_C(\d+)_M(\d+)'):
+    def objectnames(self,csv_file,pattern = r'_day-(\d+)_C(\d+)_M(\d+)'):
         matches = re.search(pattern, csv_file)
         if matches:
-            self.cage = matches.group(1)  # Extracts C4478776
-            self.mouse = matches.group(2)  # Extracts M2
+            self.day = matches.group(1)
+            self.cage = matches.group(2)  # Extracts C4478776
+            self.mouse = matches.group(3)  # Extracts M2
         else:
             print('problem')
 
