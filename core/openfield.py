@@ -53,6 +53,7 @@ class openfield_graphics(graphics):
         x_inner,y_inner=x[boolout],y[boolout]
         x_outer,y_outer=x[~boolout],y[~boolout]
         
+        self.session_lengths = len(x_inner)+len(x_outer)
         self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
         self.percent_time_outer=len(x_outer)/(len(x_inner)+len(x_outer))
         self.inner_circle_boolean=boolout
@@ -184,6 +185,29 @@ class openfield_statistics(openfield_pipeline):
                   
             self.tables.append(table_f) # Put all tables into a list
 
+    def table_plots(self,xaxis='day'):
+        for table in self.tables:
+            table_name = table.columns[-1]
+            table["subject"]=table["cage"]+table["animal"]
+            table = table[table["group"] != "CONTROL"] # DELETE LATER
+            table_av = table.groupby(xaxis).agg(Mean=(table_name, "mean"),
+                                             StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
+
+            plt.figure(figsize=(10, 10))
+            plt.bar(table_av[xaxis], table_av["Mean"], yerr=table_av["StandardError"], capsize=5, color='skyblue', edgecolor='black')
+
+            for subject, subject_data in table.groupby("subject"):
+                #plt.plot(subject_data[xaxis], subject_data[table_name], linestyle='-', linewidth=2, color='black', alpha=0.7)
+                plt.scatter(subject_data[xaxis], subject_data[table_name])
+
+            plt.xlabel(xaxis)
+            plt.ylabel(f"Mean {table_name} ± Standard Error")
+            plt.title(f"Mean {table_name} with Error Bars")
+            plt.grid(axis='y', linestyle='--')
+            plt.tight_layout()
+            output=os.path.join(self.drop_directory,f'{table_name}_averages.jpg')
+            plt.savefig(output)
+
     def models(self):
         self.models=[]
         self.results=[]
@@ -235,7 +259,10 @@ if __name__=='__main__':
     primaryobject()
 
     # Build data tables
-    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer"])
+    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer","session_lengths"])
+
+    # Generate plots for tables
+    primaryobject.table_plots()
 
     # Run statistical analyses 
     ipdb.set_trace()

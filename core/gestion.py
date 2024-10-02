@@ -18,8 +18,9 @@ import ipdb
 
 class ingestion():
     """ Breaks DLC output csv files into common components for analyses """
-    def __init__(self,csv_file,threshold=0.9,framerate=1,cms_per_pixel=1,rolling_window=None):
+    def __init__(self,csv_file,threshold=0.9,framerate=1,cms_per_pixel=1,rolling_window=None,max_frame=108000):
         self.raw_data = pd.read_csv(csv_file) # Read file into df
+        self.raw_data=self.raw_data[:max_frame]
         self.df = self.raw_data.iloc[2:,1:] #cut off unessesary data
         self.data = self.df.to_numpy() #convert to numpy array
         self.data = self.data.astype(float) #numpy array MUST be floats, not string/objs
@@ -48,7 +49,6 @@ class ingestion():
             if '_cort_' in self.csv_file:
                 self.group='CORT'
             else:
-                ipdb.set_trace()
                 self.group='CONTROL'
         else:
             print('problem')
