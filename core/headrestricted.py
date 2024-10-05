@@ -19,6 +19,10 @@ from statsmodels.formula.api import mixedlm
 import pandas as pd
 import ipdb
 
+# Take both front and side video and merge into single objects
+# Run code without a experimental field shape
+# Re calculate movement metrics .... 
+
 class headrestricted_graphics(graphics):
     """ head restricted graphics ... uses graphics class to calculate the following details:
         (1) Calculate movement metrics (velocity, distance, acceleration) of body and body parts. 

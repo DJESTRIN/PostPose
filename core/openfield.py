@@ -146,7 +146,7 @@ class openfield_statistics(openfield_pipeline):
     Description: This class is meant to pull all of the important data from each digestion object across groups 
         and capture statistics for each group. 
     """
-    def build_tables(self,dependent_variables=["number_entries_innercircle"],independent_variables=["cage","mouse","day","group"]):
+    def build_tables(self,dependent_variables=["number_entries_innercircle"],independent_variables=["cage","mouse","day","group"],export_csv=True):
         """ Build tables -- this method takes dependent variables and generates an aggregated table of the dependent variable
             given the list of independent variables.
         """
@@ -185,12 +185,19 @@ class openfield_statistics(openfield_pipeline):
                   
             self.tables.append(table_f) # Put all tables into a list
 
-    def table_plots(self,xaxis='day'):
+            # If true, export all tables as a csv file into the results folder. 
+            if export_csv:
+                for table in self.tables:
+                    table_name = table.columns[-1]
+                    output_csv_file = os.path.join(self.drop_directory,f"{table_name}.csv")
+                    table.to_csv(output_csv_file)
+
+    def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
             table_name = table.columns[-1]
             table["subject"]=table["cage"]+table["animal"]
-            table = table[table["group"] != "CONTROL"] # DELETE LATER
-            table_av = table.groupby(xaxis).agg(Mean=(table_name, "mean"),
+            #table = table[table["group"] != "CONTROL"] # DELETE LATER
+            table_av = table.groupby(["day","group"]).agg(Mean=(table_name, "mean"),
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
 
             plt.figure(figsize=(10, 10))

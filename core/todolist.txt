@@ -1,27 +1,16 @@
-(3) Is there anything special needed for the TST and head fixed analysis? Or does distance and speed suffice?
+(1) Is there anything special needed for the TST and head fixed analysis? Or does distance and speed suffice?
     -Head fixed needs to have a way to look at metrics before and after trials ....
 
-(4) How are we going to parse videos by day? 
-    -Maybe I can write a function (which is hard coded) to rename files 
-        Ex. 08_14 ==> BaselineDay1 ?
-        Rename files to include day0, day7?, day14, day30
-        Rename files to include groups: cort, control
-        Ex. 24-09-12_day0_cort_C4629531_M1_front ....
+(2) Number of head entries???
 
-(5) Is there a reason why we would need to pull all data for each subject into a single object file?
-    - What is most reusable for the future?
-    - Is this unnecessary? 
+(3) Are there different N for the summary data across conditions? 
+    - Initially, we thought yes, but csv files indicate no because they are all same length.
 
-(6) Incorporate code that allows us to run stats and get final datasets. 
-    - What should the final dataset look like?
-        (A) A pickled object file that is parsable? Easiest to implement but harder for non-coders
-        (B) A table. Really hard to implement because there are so many ways a table could be made. 
-    - Should statistics be run in python? I am thinking yes. 
+(4) Unbiased analysis of openfield circle diameter? 
+    What is a good way of defining the inner circle? We want a place where mice intentially enter the inner circle, not just spiratically move. 
+    Plot day 0 times in inner circle with respect to diameter, find a threshold? I think this should be done for all day 0 mice regardless of group
+    because they are stress naive 
 
-(7) What is the organization of the real data right now?
-    - get more example data from Kenneth. 
-
-(8) Add in an upper stop to the amount of time... 
-(9) Put the tables into csv ...
-Number of head entries???
-    why are there different N for the tables??? Get animal with missing data and figure out why. 
+(5) Normalizing behavior. Is it best to normalize all behavior to day 0? Using a normalized changge score per say?
+    Normalization = (X - mouse day 0 average)/(mouse day 0 standard deviation)
+    This would force day 0 data --> 0. 
