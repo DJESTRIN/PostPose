@@ -15,20 +15,22 @@ import glob,os
 import tqdm
 import ipdb
 
-def deviation_image(video_file,skip=1):
+def deviation_image(video_file,skip=1,stop=1000):
     cap = cv2.VideoCapture(video_file)
     frame_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     flag=0
     images=[]
-    for framen in range(frame_length):
+    for i,framen in tqdm.tqdm(enumerate(range(frame_length))):
         cap.set(cv2.CAP_PROP_POS_FRAMES, framen)
         _, image_oh = cap.read()
         image_oh = cv2.cvtColor(image_oh, cv2.COLOR_BGR2GRAY)
         image_oh=np.asarray(image_oh)
         images.append(image_oh)
+        if i>stop:
+            break
 
     images = np.asarray(images)
-    deviation_image = np.std(images[:10000,:,:],axis=0)
+    deviation_image = np.std(images[:1000,:,:],axis=0)
     return images, deviation_image.astype(np.uint8)
 
 def detect_blobs(image,threshold=10,stop=5):
