@@ -11,6 +11,12 @@
     Plot day 0 times in inner circle with respect to diameter, find a threshold? I think this should be done for all day 0 mice regardless of group
     because they are stress naive 
 
-(5) Normalizing behavior. Is it best to normalize all behavior to day 0? Using a normalized changge score per say?
+    Take only control data and what inner circle size results no change across days.. 
+    Find greatest change in slope and use that as threshold 
+
+(5) Normalizing behavior. Is it best to normalize all behavior to day 0? Using a normalized change score per say?
     Normalization = (X - mouse day 0 average)/(mouse day 0 standard deviation)
     This would force day 0 data --> 0. 
+
+(6) Calculate average distance from center (with respect to CORT and control). 
+    Should we use this as a metric

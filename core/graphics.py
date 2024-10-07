@@ -284,6 +284,7 @@ class graphics():
         print(self.digested_obj)
         output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_heatmaps.jpg')
         plt.savefig(output_path)
+        plt.close()
 
     def plot_metrics(self,downsample=1):
         """ Generates a figure for the distance, speed and 

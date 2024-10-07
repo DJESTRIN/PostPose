@@ -63,7 +63,7 @@ class ingestion():
         for xs,ys,ps in zip(self.x.T,self.y.T,self.p.T): #Loop over each column
 
             xsoh,ysoh=[],[] #place holder list for updated data
-            for x,y,p in tqdm.tqdm(zip(xs,ys,ps),total=len(xs)): #Loop over each point, tqdm shows progress bar
+            for x,y,p in zip(xs,ys,ps): #Loop over each point
                 if p<self.threshold:
                     x=np.nan
                     y=np.nan

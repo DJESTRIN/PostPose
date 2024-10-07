@@ -16,6 +16,8 @@ import os, re
 import matplotlib.pyplot as plt
 from statsmodels.formula.api import mixedlm
 import pandas as pd
+from tqdm import tqdm
+import gc
 import ipdb
 
 class openfield_graphics(graphics):
@@ -229,6 +231,7 @@ class openfield_statistics(openfield_pipeline):
             plt.tight_layout()
             output=os.path.join(self.drop_directory,f'{table_name}_averages.jpg')
             plt.savefig(output)
+            plt.close()
 
     def models(self):
         self.models=[]
@@ -264,28 +267,35 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--root_directory',type=str,required=True)
     parser.add_argument('--force', action='store_true', help="Delete previos objects and recalculate them")
+    parser.add_argument('--percent', type=str,required=True)
     args=parser.parse_args()
 
-    # Delete previously made objects
+    # Loop over percentiles for inner circle diameter
+    final_list=[]
+
     if args.force:
         delete_saved_objects(root_dir=args.root_directory)
+
+    percent = float(args.percent)/100
 
     # Set up main object 
     primaryobject=openfield_statistics(root_dir=args.root_directory)
 
-    # set shapes 
-    shapesoh,shapestringsoh = generate_openfield_shapes(input_circle_shape=[[[360,260,200]]],input_shape_string=[[['circle']]])
+    # Update percent of the circle 
+    shapesoh,shapestringsoh = generate_openfield_shapes(input_circle_shape=[[[360,260,200]]],input_shape_string=[[['circle']]],percent=percent)
+    
+    # Add circle as shape
     primaryobject.set_shapes(shape_positions=shapesoh,shapes=shapestringsoh)
 
     # Run main object
     primaryobject()
 
-    # Build data tables
-    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer","av_distance","session_lengths"])
+    # Get table of inner time 
+    primaryobject.build_tables(dependent_variables=["av_distance"])
+    table_oh = primaryobject.tables[0]
+    table_oh = table_oh[table_oh["day"] == "0"]
 
-    # Generate plots for tables
-    primaryobject.table_plots()
+    df = pd.DataFrame({"percent":[percent],"av_distance":[table_oh['av_distance'].mean()]})
+    outfile=os.path.join(r"C:\Users\listo\Downloads\innercircle_diameter_results",f'percent_{args.percent}.csv')
+    df.to_csv(outfile)
 
-    # Run statistical analyses 
-    ipdb.set_trace()
-    primaryobject.models()

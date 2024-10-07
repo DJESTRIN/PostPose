@@ -40,7 +40,9 @@ class pipeline:
     def find_files(self,extension=".csv"):
         """ find all files of interest (csv, video, etc) in 
         current directory and put them in organized list """
-        return glob.glob(f"{self.root_dir}/**/*{extension}", recursive=True)
+        found_files = glob.glob(f"{self.root_dir}/**/*{extension}", recursive=True)
+        found_files = [file for file in found_files if 'result' not in file]
+        return found_files
 
     def match_csv_to_video(self,csv_file):
         original_videos = [s for s in self.video_files if 'resnet' not in s.lower()] # removes any of the labeled videos from list
