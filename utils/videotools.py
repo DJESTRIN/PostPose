@@ -15,19 +15,20 @@ import glob,os
 import tqdm
 import ipdb
 
-def deviation_image(video_file,skip=1,stop=1000):
+def deviation_image(video_file,skip=1,stop=None):
     cap = cv2.VideoCapture(video_file)
     frame_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     flag=0
     images=[]
-    for i,framen in tqdm.tqdm(enumerate(range(frame_length))):
+    for i,framen in tqdm.tqdm(enumerate(range(frame_length)),total=frame_length):
         cap.set(cv2.CAP_PROP_POS_FRAMES, framen)
         _, image_oh = cap.read()
         image_oh = cv2.cvtColor(image_oh, cv2.COLOR_BGR2GRAY)
         image_oh=np.asarray(image_oh)
         images.append(image_oh)
-        if i>stop:
-            break
+        if stop is not None:
+            if i>stop:
+                break
 
     images = np.asarray(images)
     deviation_image = np.std(images[:1000,:,:],axis=0)
@@ -78,21 +79,47 @@ def detect_blobs(image,threshold=10,stop=5):
     return current_list, yyvals[0][1]
 
 def crop_around_coordinate(video_name,video,x,y,paddingx=50,paddingy=90,fpsoh=60, display=False):
-    cropped_video = video[:,int(y-paddingy):int(y+paddingy),int(x-paddingx):int(x+paddingx)]
-    # write cropped numpy array to video
-    out = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'),fpsoh,(cropped_video.shape[2],cropped_video.shape[1]))
-    for frame in cropped_video:
-        frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        out.write(frame)
+    # Is the video a string or an array? string implies video is too big to be an array
+    if isinstance(video,str):
+        cap = cv2.VideoCapture(video) # open the video
+        frame_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) #get frame length
+        out = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'),fpsoh,(paddingx*2,paddingy*2)) # set up outward file
+
+        # Loop over frames, crop and then save into outward file
+        for framen in tqdm.tqdm(range(frame_length),total=frame_length):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, framen)
+            _, frame = cap.read() # read image
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # convert to gray
+            frame = np.asarray(frame) # convert to numpy array
+            frame = frame[int(y-paddingy):int(y+paddingy),int(x-paddingx):int(x+paddingx)] # crop numpy array
+            frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            out.write(frame)
+            if display:
+                cv2.imshow('Video', frame)
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    break
+            
+        out.release()
         if display:
-            cv2.imshow('Video', frame)
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                break
-        
-    out.release()
-    if display:
-        cv2.destroyAllWindows()
+            cv2.destroyAllWindows()
+
+    else:
+        cropped_video = video[:,int(y-paddingy):int(y+paddingy),int(x-paddingx):int(x+paddingx)]
+        # write cropped numpy array to video
+        out = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'),fpsoh,(cropped_video.shape[2],cropped_video.shape[1]))
+        for frame in cropped_video:
+            frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            out.write(frame)
+            if display:
+                cv2.imshow('Video', frame)
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    break
+            
+        out.release()
+        if display:
+            cv2.destroyAllWindows()
 
 def display_video(video_path):
     cap = cv2.VideoCapture(video_path)
