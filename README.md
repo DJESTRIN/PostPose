@@ -4,10 +4,13 @@ A repository for analyzing outputs of DeepLabCut, a pose-estimation software. Th
 <h2> <b> ⚠️ Warning: This code is still under development. ⚠️ </b> </h2>
 Please kindly ignore any issues with code as well as any missing citations to others code. 
 
+<h2> <b> Examples </b> </h2>
+One can build an experimental arena in order to track specific regions of interest.
 <p float="left">
   <img src="https://github.com/DJESTRIN/PostPose/blob/main/examples/example_arena.png" width="500" />
 </p>
 
+DLC-derived tracking data is then parsed in order to analyze various metrics in regions of interest.
 <p float="left">
   <img src="https://github.com/DJESTRIN/PostPose/blob/main/examples/example_result.png" width="500" />
 </p>
