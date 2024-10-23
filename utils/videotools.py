@@ -148,14 +148,13 @@ def generate_filenames(video_file,output_dir):
 
     # Build file names for each mouse into list
     midnames=names[1:-1]
-    finname,_=names[-1].split('.m')
+    finname,_=names[-1].split('.av')
     running_list=[f'{root_info}_M{name}.mp4' for name in midnames]
     running_list.append(f'{root_info}_M{finname}.mp4') 
-    ipdb.set_trace()
     return running_list 
 
 def main(search_path=r'C:\Users\listo\Downloads\OneDrive_2_9-19-2024\redo',output_path=r'C:\Users\listo\Downloads\TST_02_09-19-2024_cropped'):
-    search_string=os.path.join(search_path,'*.mp4')
+    search_string=os.path.join(search_path,'*.avi')
     videos=glob.glob(search_string)
 
     for video_fileoh in tqdm.tqdm(videos):
@@ -169,4 +168,4 @@ def main(search_path=r'C:\Users\listo\Downloads\OneDrive_2_9-19-2024\redo',outpu
     return 
 
 if __name__=='__main__':
-   main()
+   main(search_path=r'C:\Users\listo\Downloads\TST\TST',output_path=r'C:\Users\listo\Downloads\TST_cropped')

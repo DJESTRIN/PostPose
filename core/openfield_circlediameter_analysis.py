@@ -296,6 +296,6 @@ if __name__=='__main__':
     table_oh = table_oh[table_oh["day"] == "0"]
 
     df = pd.DataFrame({"percent":[percent],"av_distance":[table_oh['av_distance'].mean()]})
-    outfile=os.path.join(r"C:\Users\listo\Downloads\innercircle_diameter_results",f'percent_{args.percent}.csv')
+    outfile=os.path.join(r"C:\Users\listo\Downloads\i",f'percent_{args.percent}.csv')
     df.to_csv(outfile)
 

@@ -69,7 +69,10 @@ class openfield_graphics(graphics):
         x_outer,y_outer=x[~boolout],y[~boolout]
         
         self.session_lengths = len(x_inner)+len(x_outer)
-        self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
+        try:
+            self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
+        except:
+            ipdb.set_trace()
         self.percent_time_outer=len(x_outer)/(len(x_inner)+len(x_outer))
         self.inner_circle_boolean=boolout
 
@@ -161,7 +164,7 @@ class openfield_statistics(openfield_pipeline):
     Description: This class is meant to pull all of the important data from each digestion object across groups 
         and capture statistics for each group. 
     """
-    def build_tables(self,dependent_variables=["number_entries_innercircle"],independent_variables=["cage","mouse","day","group"],export_csv=True):
+    def build_tables(self,dependent_variables=["number_entries_innercircle"],independent_variables=["cage","mouse","day","group"],export_csv=True,normalize=True):
         """ Build tables -- this method takes dependent variables and generates an aggregated table of the dependent variable
             given the list of independent variables.
         """
@@ -207,20 +210,39 @@ class openfield_statistics(openfield_pipeline):
                     output_csv_file = os.path.join(self.drop_directory,f"{table_name}.csv")
                     table.to_csv(output_csv_file)
 
+            if normalize:
+                for table in self.tables:
+                    table_name = table.columns[-1]
+                    table["subject"]=table["cage"]+table["animal"]
+
+                    # Calculate percent change from day 0
+                    ipdb.set_trace()
+                    day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
+                    table[table_name] = table[table_name] / table['subject'].map(day0_values)
+
     def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
+            ipdb.set_trace()
             table_name = table.columns[-1]
-            table["subject"]=table["cage"]+table["animal"]
-            #table = table[table["group"] != "CONTROL"] # DELETE LATER
             table_av = table.groupby(["day","group"]).agg(Mean=(table_name, "mean"),
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
 
             plt.figure(figsize=(10, 10))
-            plt.bar(table_av[xaxis], table_av["Mean"], yerr=table_av["StandardError"], capsize=5, color='skyblue', edgecolor='black')
+            plt.bar(table_av[xaxis], table_av["Mean"], yerr=table_av["StandardError"], capsize=5, color='grey', edgecolor='black')
+
+            groups = table['group'].unique()
+            colors = {group: color for group, color in zip(groups, plt.cm.rainbow(range(len(groups))))}
 
             for subject, subject_data in table.groupby("subject"):
-                #plt.plot(subject_data[xaxis], subject_data[table_name], linestyle='-', linewidth=2, color='black', alpha=0.7)
-                plt.scatter(subject_data[xaxis], subject_data[table_name])
+                # Set up color for subject
+                for i,color in enumerate(colors.items()):
+                    if subject_data['group'].to_string(index=False)=='CORT' and i==0:
+                        color_oh="red"
+                    if subject_data['group'].to_string(index=False)=='CONTROL' and i!=0:
+                        color_oh="blue"
+
+                # plot individual subject data
+                plt.scatter(subject_data[xaxis], subject_data[table_name],color=color_oh)
 
             plt.xlabel(xaxis)
             plt.ylabel(f"Mean {table_name} ± Standard Error")

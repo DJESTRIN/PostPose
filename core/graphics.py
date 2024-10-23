@@ -145,6 +145,7 @@ class experimental_field:
             plt.imshow(final_image)
             plt.axis('off')
             plt.savefig(drop_file)
+            plt.close()
             return 
 
         # Determine if arena image exists
@@ -308,6 +309,7 @@ class graphics():
         print(self.digested_obj)
         output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_metricsgraph.jpg')
         plt.savefig(output_path)
+        plt.close()
     
     @classmethod
     def load(cls,filename):
