@@ -204,22 +204,22 @@ class openfield_statistics(openfield_pipeline):
                   
             self.tables.append(table_f) # Put all tables into a list
 
-            # If true, export all tables as a csv file into the results folder. 
-            if export_csv:
-                for table in self.tables:
-                    table_name = table.columns[-1]
-                    output_csv_file = os.path.join(self.drop_directory,f"{table_name}.csv")
-                    table.to_csv(output_csv_file)
+        # If true, export all tables as a csv file into the results folder. 
+        if export_csv:
+            for table in self.tables:
+                table_name = table.columns[-1]
+                output_csv_file = os.path.join(self.drop_directory,f"{table_name}.csv")
+                table.to_csv(output_csv_file)
 
-            if normalize:
-                for table in self.tables:
-                    table_name = table.columns[-1]
-                    table["subject"]=table["cage"]+table["animal"]
+        if normalize:
+            for table in self.tables:
+                table_name = table.columns[-1]
+                table["subject"]=table["cage"]+table["animal"]
 
-                    # Calculate percent change from day 0
-                    ipdb.set_trace()
-                    day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
-                    table[table_name] = table[table_name] / table['subject'].map(day0_values)
+                # Calculate percent change from day 0
+                ipdb.set_trace()
+                day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
+                table[table_name] = table[table_name] / table['subject'].map(day0_values)
 
     def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
