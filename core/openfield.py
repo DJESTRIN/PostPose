@@ -222,7 +222,7 @@ class openfield_statistics(openfield_pipeline):
 
     def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
-            table_name = table.columns[-2]
+            table_name = table.columns[-1]
             table_av = table.groupby(["day","group"]).agg(Mean=(table_name, "mean"),
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
 
