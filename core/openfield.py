@@ -184,16 +184,10 @@ class openfield_statistics(openfield_pipeline):
 
                         # Append data to dataframe 
                         if i==0:
-                            data_oh = {'cage':attribute_values[0],
-                                       'animal':attribute_values[1],
-                                       'day':attribute_values[2],
-                                       'group':attribute_values[3], f'{depend}':depend_values}
+                            data_oh = {'cage':attribute_values[0],'animal':attribute_values[1],'day':attribute_values[2],'group':attribute_values[3], f'{depend}':depend_values}
                             table_f=pd.DataFrame([data_oh])
                         else:
-                            data_oh = {'cage':attribute_values[0],
-                                       'animal':attribute_values[1],
-                                       'day':attribute_values[2],
-                                       'group':attribute_values[3], f'{depend}':depend_values}
+                            data_oh = {'cage':attribute_values[0],'animal':attribute_values[1],'day':attribute_values[2],'group':attribute_values[3], f'{depend}':depend_values}
                             table_oh=pd.DataFrame([data_oh])
                             table_f = pd.concat([table_f, table_oh], ignore_index=True)
                 else:
