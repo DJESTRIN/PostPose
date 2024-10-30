@@ -302,7 +302,7 @@ if __name__=='__main__':
     primaryobject()
 
     # Build data tables
-    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer","av_distance","session_lengths"])
+    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer","av_distance","session_lengths"],normalize=False)
 
     # Generate plots for tables
     primaryobject.table_plots()
