@@ -216,7 +216,7 @@ class openfield_statistics(openfield_pipeline):
 
         if normalize:
             for table in self.tables:
-                table_name = table.columns[-1]
+                table_name = table.columns[-2]
                 # Calculate percent change from day 0
                 day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
                 table[table_name] = table[table_name] / table['subject'].map(day0_values)
