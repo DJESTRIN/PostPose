@@ -69,10 +69,7 @@ class openfield_graphics(graphics):
         x_outer,y_outer=x[~boolout],y[~boolout]
         
         self.session_lengths = len(x_inner)+len(x_outer)
-        try:
-            self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
-        except:
-            ipdb.set_trace()
+        self.percent_time_inner=len(x_inner)/(len(x_inner)+len(x_outer))
         self.percent_time_outer=len(x_outer)/(len(x_inner)+len(x_outer))
         self.inner_circle_boolean=boolout
 
@@ -112,6 +109,10 @@ class openfield_pipeline(pipeline):
         self.graphics_objs=[]
 
         for csvfile in self.csv_files:
+            # Exclude non openfield csv files
+            if 'open_field' not in csvfile.lower() and 'openfield' not in csvfile.lower():
+                continue
+
             outputfile,_=csvfile.split('.cs')
             outputfile+='digestion.pkl'
 
