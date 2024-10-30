@@ -217,6 +217,7 @@ class openfield_statistics(openfield_pipeline):
                     table["subject"]=table["cage"]+table["animal"]
 
                     # Calculate percent change from day 0
+                    ipdb.set_trace()
                     day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
                     table[table_name] = table[table_name] / table['subject'].map(day0_values)
 
