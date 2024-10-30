@@ -204,6 +204,9 @@ class openfield_statistics(openfield_pipeline):
                   
             self.tables.append(table_f) # Put all tables into a list
 
+        for table in self.tables:
+            table["subject"]=table["cage"]+table["animal"]
+
         # If true, export all tables as a csv file into the results folder. 
         if export_csv:
             for table in self.tables:
@@ -214,16 +217,13 @@ class openfield_statistics(openfield_pipeline):
         if normalize:
             for table in self.tables:
                 table_name = table.columns[-1]
-                table["subject"]=table["cage"]+table["animal"]
-
                 # Calculate percent change from day 0
                 day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
                 table[table_name] = table[table_name] / table['subject'].map(day0_values)
 
     def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
-            ipdb.set_trace()
-            table_name = table.columns[-1]
+            table_name = table.columns[-2]
             table_av = table.groupby(["day","group"]).agg(Mean=(table_name, "mean"),
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
 
