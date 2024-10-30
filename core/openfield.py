@@ -217,13 +217,11 @@ class openfield_statistics(openfield_pipeline):
                     table["subject"]=table["cage"]+table["animal"]
 
                     # Calculate percent change from day 0
-                    ipdb.set_trace()
                     day0_values = table[table['day'] == '0'].set_index('subject')[table_name]
                     table[table_name] = table[table_name] / table['subject'].map(day0_values)
 
     def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
-            ipdb.set_trace()
             table_name = table.columns[-1]
             table_av = table.groupby(["day","group"]).agg(Mean=(table_name, "mean"),
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
@@ -309,6 +307,6 @@ if __name__=='__main__':
     # Generate plots for tables
     primaryobject.table_plots()
 
-    # Run statistical analyses 
-    ipdb.set_trace()
-    primaryobject.models()
+    # # Run statistical analyses 
+    # ipdb.set_trace()
+    # primaryobject.models()
