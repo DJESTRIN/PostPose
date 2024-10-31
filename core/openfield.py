@@ -230,6 +230,7 @@ class openfield_statistics(openfield_pipeline):
                 group_data = table_av[table_av["group"] == group]
                 offset = group_offsets[group]
                 coloroh = group_colors[group]
+                ipdb.set_trace()
                 plt.bar(
                     group_data[xaxis] + offset, 
                     group_data["Mean"], 
