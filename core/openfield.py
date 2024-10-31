@@ -32,7 +32,7 @@ class openfield_graphics(graphics):
         self.calculate_percent_time()
         self.calculate_distance_to_center()
         self.number_entries_innercircle = self.calculate_transitions_innercircle()
-        #self.circle_metrics()
+        self.circle_metrics()
 
     def is_inside_circle(self,x_trajectory,y_trajectory, x_center, y_center, radius):
         distances_squared = (x_trajectory - x_center) ** 2 + (y_trajectory - y_center) ** 2
@@ -80,6 +80,7 @@ class openfield_graphics(graphics):
     def circle_metrics(self):
         """ circle metrics: re-calculate the distance, speed and acceleration_mag 
             inside the inner circle versus outer circle """
+        ipdb.set_trace()
         # Calculate cumulative distance in inner vs outer circle
         distance_inner = self.digested_obj.av_distance[self.inner_circle_boolean[:-1]]
         distance_outer = self.digested_obj.av_distance[~self.inner_circle_boolean[:-1]]
