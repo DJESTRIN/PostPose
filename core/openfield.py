@@ -80,7 +80,6 @@ class openfield_graphics(graphics):
     def circle_metrics(self):
         """ circle metrics: re-calculate the distance, speed and acceleration_mag 
             inside the inner circle versus outer circle """
-        ipdb.set_trace()
         # Calculate cumulative distance
         self.total_distance=np.sum(self.digested_obj.av_distance)*self.digested_obj.cms_per_pixel*0.1 # In pixels ==> NEED TO CONVERT TO CM
 
@@ -294,7 +293,14 @@ if __name__=='__main__':
     primaryobject()
 
     # Build data tables
-    primaryobject.build_tables(dependent_variables=["number_entries_innercircle","percent_time_inner","percent_time_outer","av_distance","session_lengths"])
+    primaryobject.build_tables(dependent_variables=["number_entries_innercircle",
+                                                    "percent_time_inner",
+                                                    "percent_time_outer",
+                                                    "av_distance",
+                                                    "total_distance",
+                                                    "average_speed",
+                                                    "average_acc",
+                                                    "session_lengths"])
 
     # Generate plots for tables
     primaryobject.table_plots()
