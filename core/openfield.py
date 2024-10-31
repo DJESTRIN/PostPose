@@ -81,24 +81,14 @@ class openfield_graphics(graphics):
         """ circle metrics: re-calculate the distance, speed and acceleration_mag 
             inside the inner circle versus outer circle """
         ipdb.set_trace()
-        # Calculate cumulative distance in inner vs outer circle
-        distance_inner = self.digested_obj.av_distance[self.inner_circle_boolean[:-1]]
-        distance_outer = self.digested_obj.av_distance[~self.inner_circle_boolean[:-1]]
-        self.total_distance_inner=np.sum(distance_inner) # In pixels ==> NEED TO CONVERT TO CM
-        self.total_distance_outer=np.sum(distance_outer)
+        # Calculate cumulative distance
+        self.total_distance=np.sum(self.digested_obj.av_distance)*self.digested_obj.cms_per_pixel*0.1 # In pixels ==> NEED TO CONVERT TO CM
 
-        # Calculate average speed in inner vs outer circle
-        speed_inner = self.digested_obj.av_speed[self.inner_circle_boolean[:-2]]
-        speed_outer = self.digested_obj.av_speed[~self.inner_circle_boolean[:-2]]
-        self.average_speed_inner=np.mean(speed_inner) # In pixels ==> NEED TO CONVERT TO CM
-        self.average_speed_outer=np.mean(speed_outer)
+        # Calculate average speed 
+        self.average_speed=np.mean(self.digested_obj.av_speed)*self.digested_obj.cms_per_pixel*0.1 
 
         # Calculate average acceleration magnitude in inner vs outer circle
-        acc_inner = self.digested_obj.av_acc_mag[self.inner_circle_boolean[:-3]]
-        acc_outer = self.digested_obj.av_acc_mag[~self.inner_circle_boolean[:-3]]
-        self.average_acc_inner=np.mean(acc_inner) # In pixels ==> NEED TO CONVERT TO CM
-        self.average_acc_outer=np.mean(acc_outer)
-        ipdb.set_trace()
+        self.average_acc=np.mean(self.digested_obj.av_acc_mag)*self.digested_obj.cms_per_pixel*0.1 # In pixels ==> NEED TO CONVERT TO CM
 
 class openfield_pipeline(pipeline):
     """ Updated pipeline class to accomodate openfield_graphics class """
