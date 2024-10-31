@@ -213,34 +213,57 @@ class openfield_statistics(openfield_pipeline):
 
     def table_plots(self,xaxis='day',group='group'):
         for table in self.tables:
+            # Get table data
             table_name = table.columns[-2]
             table_av = table.groupby(["day","group"]).agg(Mean=(table_name, "mean"),
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
 
+            # Set offsets for each group
+            group_offsets = {"CORT": -0.2, "CONTROL": 0.2}
+            group_colors = {"CORT": 'red', "CONTROL": 'blue'}
+
+            # Create figure
             plt.figure(figsize=(10, 10))
-            plt.bar(table_av[xaxis], table_av["Mean"], yerr=table_av["StandardError"], capsize=5, color='grey', edgecolor='black')
 
-            groups = table['group'].unique()
-            colors = {group: color for group, color in zip(groups, plt.cm.rainbow(range(len(groups))))}
+            # Plot bars with offsets according to group
+            for group in table_av["group"].unique():
+                group_data = table_av[table_av["group"] == group]
+                offset = group_offsets[group]
+                coloroh = group_colors[group]
+                plt.bar(
+                    group_data[xaxis] + offset, 
+                    group_data["Mean"], 
+                    yerr=group_data["StandardError"], 
+                    capsize=5, 
+                    color=coloroh, 
+                    edgecolor='black',
+                    label=f"Mean {group}"
+                )
 
+            # Plot individual subject data with corresponding offsets and colors
             for subject, subject_data in table.groupby("subject"):
-                # Set up color for subject
-                for i,color in enumerate(colors.items()):
-                    if subject_data['group'].to_string(index=False)=='CORT' and i==0:
-                        color_oh="red"
-                    if subject_data['group'].to_string(index=False)=='CONTROL' and i!=0:
-                        color_oh="blue"
+                group = subject_data["group"].iloc[0]
+                offset = group_offsets[group]
+                color_oh = "red" if group == "CORT" else "blue"
+                
+                # Scatter plot points with the same offset as the bars
+                plt.scatter(
+                    subject_data[xaxis] + offset, 
+                    subject_data[table_name], 
+                    color=color_oh, 
+                    label=group if subject == table["subject"].iloc[0] else ""  # Add legend once per group
+                )
 
-                # plot individual subject data
-                plt.scatter(subject_data[xaxis], subject_data[table_name],color=color_oh)
-
+            # Add labels and formatting
             plt.xlabel(xaxis)
             plt.ylabel(f"Mean {table_name} ± Standard Error")
             plt.title(f"Mean {table_name} with Error Bars")
+            plt.legend()
             plt.grid(axis='y', linestyle='--')
             plt.tight_layout()
             output=os.path.join(self.drop_directory,f'{table_name}_averages.jpg')
             plt.savefig(output)
+
 
     def models(self):
         self.models=[]
