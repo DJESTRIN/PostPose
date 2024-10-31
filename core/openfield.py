@@ -300,7 +300,8 @@ if __name__=='__main__':
                                                     "total_distance",
                                                     "average_speed",
                                                     "average_acc",
-                                                    "session_lengths"])
+                                                    "session_lengths"],
+                                                    normalize=False)
 
     # Generate plots for tables
     primaryobject.table_plots()
