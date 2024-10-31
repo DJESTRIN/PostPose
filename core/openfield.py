@@ -219,7 +219,7 @@ class openfield_statistics(openfield_pipeline):
                                              StandardError=(table_name, lambda x: np.std(x, ddof=1) / np.sqrt(len(x)))).reset_index()
 
             # Set offsets for each group
-            group_offsets = {"CORT": -0.2, "CONTROL": 0.2}
+            group_offsets = {"CORT": -1, "CONTROL": 1}
             group_colors = {"CORT": 'red', "CONTROL": 'blue'}
 
             # Create figure
@@ -237,6 +237,9 @@ class openfield_statistics(openfield_pipeline):
                     capsize=5, 
                     color=coloroh, 
                     edgecolor='black',
+                    width=1,          # Set bar width
+                    alpha=0.6,         # Set bar transparency
+                    error_kw={'elinewidth': 2},
                     label=f"Mean {group}"
                 )
 
