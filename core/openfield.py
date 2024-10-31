@@ -230,9 +230,8 @@ class openfield_statistics(openfield_pipeline):
                 group_data = table_av[table_av["group"] == group]
                 offset = group_offsets[group]
                 coloroh = group_colors[group]
-                ipdb.set_trace()
                 plt.bar(
-                    group_data[xaxis] + offset, 
+                    group_data[xaxis].astype(float).values + offset, 
                     group_data["Mean"], 
                     yerr=group_data["StandardError"], 
                     capsize=5, 
@@ -249,7 +248,7 @@ class openfield_statistics(openfield_pipeline):
                 
                 # Scatter plot points with the same offset as the bars
                 plt.scatter(
-                    subject_data[xaxis] + offset, 
+                    subject_data[xaxis].astype(float).values + offset, 
                     subject_data[table_name], 
                     color=color_oh, 
                     label=group if subject == table["subject"].iloc[0] else ""  # Add legend once per group
