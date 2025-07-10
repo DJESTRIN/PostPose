@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Module name: graphics.py
+Module name: openfield.py
 Description: 
 Author: David Estrin
 Version: 1.0
 Date: 08-29-2024
 """
+
 from gestion import digestion
 from main import pipeline, delete_saved_objects
 from graphics import graphics, experimental_field
@@ -331,6 +332,8 @@ if __name__=='__main__':
 
     # Generate plots for tables
     primaryobject.table_plots()
+
+    ipdb.set_trace()
 
     # # Run statistical analyses 
     # ipdb.set_trace()

@@ -110,8 +110,8 @@ class experimental_field:
             # Every other polygon
             elif type[0]=='polygon':
                 # Parse vertices
-                (xs,ys) = shape_coordinates
-                allx, ally = polygon(xs, ys)
+                xs, ys = zip(*shape_coordinates)
+                allx, ally = polygon(ys, xs)  
                 output_image[allx, ally] = 1
             # Throw error
             else:
@@ -176,10 +176,11 @@ class experimental_field:
             pickle.dump(self, file)
                     
 class graphics():
-    def __init__(self,digested_obj,arena_obj,drop_directory=[]):
+    def __init__(self,digested_obj,arena_obj,behavior_name='None',drop_directory=[]):
         # Set up attributes
         self.digested_obj=digested_obj #Get the digestion object
         self.arena_obj=arena_obj # Get the arena object created with experimental field class
+        self.behavior_name = behavior_name
 
         # Determine where figures will be dropped
         if drop_directory:
@@ -283,7 +284,7 @@ class graphics():
     
         plt.tight_layout()
         print(self.digested_obj)
-        output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_heatmaps.jpg')
+        output_path = os.path.join(self.drop_directory,f'{self.digested_obj.string}_{self.behavior_name}_heatmaps.jpg')
         plt.savefig(output_path)
         plt.close()
 
